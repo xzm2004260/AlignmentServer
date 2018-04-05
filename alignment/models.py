@@ -1,10 +1,11 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from composition.models import Composition
+import uuid
 
 
 class Alignment(models.Model):
-    compositions = models.ForeignKey(Composition, unique=True, related_name='compose', on_delete=models.CASCADE)
+    compositions = models.OneToOneField(Composition,blank=True, null=True, related_name='compose', on_delete=models.CASCADE)
     created_at = models.DateTimeField(
         _('created at'),
         auto_now_add=True,
@@ -17,5 +18,5 @@ class Alignment(models.Model):
         db_table = 'alignment'
 
     def __str__(self):
-        return self.id
+        return self.created_at
 

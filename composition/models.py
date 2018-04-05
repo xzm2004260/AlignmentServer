@@ -1,9 +1,11 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from services.utils import update_filename
+import uuid
 
 
 class Composition(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     lyrics = models.FileField(upload_to=update_filename, blank=False, null=False)
     title = models.CharField(_('title'), max_length=100, blank=True, null=True)
     created_at = models.DateTimeField(

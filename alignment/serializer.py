@@ -15,7 +15,7 @@ class AlignmentSerializer(serializers.Serializer):
         title = validated_data.pop('title')
         lyrics = validated_data.pop('lyrics')
         composition_object = Composition.objects.create(lyrics=lyrics, title=title)
-        alignment = Alignment.objects.create(compositions=composition_object)
+        alignment = Alignment.objects.create(composition=composition_object)
         return alignment
 
     def to_representation(self, instance):
@@ -25,4 +25,4 @@ class AlignmentSerializer(serializers.Serializer):
         :return: dict values
 
         """
-        return {'id': instance.id, 'composition': instance.compositions_id}
+        return {'alignment_id': instance.id, 'lyrics_id': instance.composition_id}

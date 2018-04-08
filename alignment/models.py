@@ -5,7 +5,7 @@ import uuid
 
 
 class Alignment(models.Model):
-    compositions = models.OneToOneField(Composition,blank=True, null=True, related_name='compose', on_delete=models.CASCADE)
+    composition = models.OneToOneField(Composition,blank=True, null=True, related_name='compose', on_delete=models.CASCADE)
     created_at = models.DateTimeField(
         _('created at'),
         auto_now_add=True,

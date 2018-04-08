@@ -22,8 +22,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     url('admin/', admin.site.urls),
-    url('^alignment/', include('alignment.urls')),
-    url('^composition/', include('composition.urls')),
+    url('^alignments/', include('alignment.urls')),
+    url('^compositions/', include('composition.urls')),
 ]
 
 if settings.DEBUG:

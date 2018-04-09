@@ -4,7 +4,6 @@ from django.contrib.postgres.fields import ArrayField
 from composition.models import Composition
 
 
-
 class Alignment(models.Model):
 
     class Accompaniment:

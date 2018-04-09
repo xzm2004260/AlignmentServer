@@ -2,6 +2,7 @@ __pycache__/
 *.py[cod]
 .env
 .idea/
+local_settings.py
 
 
 # PostgreSql database files

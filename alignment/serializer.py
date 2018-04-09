@@ -3,6 +3,7 @@ from .models import Alignment
 from composition.models import Composition
 from rest_framework import status
 from services import exceptions
+from django.db import IntegrityError, transaction
 
 
 class AlignmentSerializer(serializers.Serializer):
@@ -22,7 +23,12 @@ class AlignmentSerializer(serializers.Serializer):
         if validated_data['lyrics']:
             title = validated_data.pop('title') if validated_data['title'] else None
             lyrics = validated_data.pop('lyrics')
-            composition_object = Composition.objects.create(lyrics=lyrics, title=title)
+
+            try:
+                with transaction.atomic():
+                    composition_object = Composition.objects.create(lyrics=lyrics, title=title)
+            except IntegrityError as e:
+                raise e.message
 
         elif validated_data['composition_id']:
             try:
@@ -45,3 +51,9 @@ class AlignmentSerializer(serializers.Serializer):
 
         """
         return {'alignment_id': instance.id, 'lyrics_id': instance.composition_id}
+
+
+class AlignmentDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Alignment
+        fields = '__all__'

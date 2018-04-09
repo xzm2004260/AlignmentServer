@@ -2,18 +2,21 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
-from .serializer import AlignmentSerializer
+from rest_framework.exceptions import NotFound
+from .serializer import AlignmentSerializer, AlignmentDetailSerializer
+from .models import Alignment
 
 
 class CreateAlignmentAPIView(APIView):
 
     """
-        POST:
+    POST:
         Create a new alignment with composition instance.
 
     """
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = AlignmentSerializer
+
 
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -28,7 +31,18 @@ class CreateAlignmentAPIView(APIView):
 
 class AlignmentDetailAPIView(APIView):
     """
-         GET:
-          Get an existing alignment instance against some id.
+    GET:
+       Get an existing alignment instance against some id.
 
-     """
+    """
+
+    def get_object(self):
+        try:
+            return Alignment.objects.get(id=self.kwargs.get('pk'))
+        except Alignment.DoesNotExist:
+            raise NotFound
+
+    def get(self, request, pk, *args, **kwargs):
+        obj = self.get_object()
+        serializer = AlignmentDetailSerializer(obj)
+        return Response(serializer.data,status=status.HTTP_200_OK)

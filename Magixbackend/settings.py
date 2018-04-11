@@ -77,7 +77,13 @@ WSGI_APPLICATION = 'Magixbackend.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
-
+DATABASES = {
+    'default': config(
+        'DATABASE_URL',
+        default='sqlite:///' + BASE_DIR.child('db.sqlite3'),
+        cast=db_url,
+    )
+}
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
 
@@ -122,7 +128,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 
-try:
-    from Magixbackend.local_settings import *
-except ImportError:
-    pass
+
+# else:
+#     try:
+#         from Magixbackend.local_settings import *
+#     except ImportError:
+#         pass
+#

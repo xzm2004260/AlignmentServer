@@ -8,13 +8,41 @@ from django.db import IntegrityError, transaction
 
 class AlignmentSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=100, required=False)
-    accompaniment = serializers.ChoiceField(required=True, choices=Alignment.Accompaniment.Choices)
-    level = serializers.ChoiceField(required=False, choices=Alignment.Level.Choices)
+    accompaniment = serializers.IntegerField(required=True)
+    level = serializers.IntegerField(required=False)
     composition_id = serializers.UUIDField(required=False, default=None)
-    lyrics = serializers.FileField(required=False, default=None)
+    lyrics = serializers.FileField(required=True)
 
     class Meta:
         fields = '__all__'
+
+    @staticmethod
+    def validate_accompaniment(value):
+        """
+
+        :param value:
+        :return: validated accompaniment value
+
+        """
+        if not value in range(1, 3):
+            raise serializers.ValidationError(
+                "{} is not a valid accompaniment. please enter 1=ACAPELLA or 2=MULTIINSTRUMENTAL"
+                .format(value))
+        return value
+
+    @staticmethod
+    def validate_level(value):
+        """
+
+        :param value:
+        :return: validated level field
+
+        """
+        if not value in range(1, 3):
+            raise serializers.ValidationError(
+                "{} is not a valid level. please enter 1=WORDS or 2=LINES"
+                .format(value))
+        return value
 
     def create(self, validated_data):
         accompaniment = validated_data.pop('accompaniment')
@@ -42,6 +70,11 @@ class AlignmentSerializer(serializers.Serializer):
 
         alignment = Alignment.objects.create(composition=composition_object, accompaniment=accompaniment, level=level)
         return alignment
+
+
+
+
+
 
     def to_representation(self, instance):
         """

@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.urls import reverse
 from django.contrib.postgres.fields import ArrayField
 from composition.models import Composition
 
@@ -86,6 +87,9 @@ class Alignment(models.Model):
         verbose_name_plural = _('alignments')
         db_table = 'alignment'
 
+    def get_absolute_url(self):
+        return reverse('alignment-detail', args=[str(self.id)])
+
     def __str__(self):
-        return self.created_at
+        return str(self.id)
 

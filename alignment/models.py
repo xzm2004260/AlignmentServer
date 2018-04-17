@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse
-from django.contrib.postgres.fields import ArrayField
+# from django.contrib.postgres.fields import ArrayField
 from composition.models import Composition
 
 
@@ -67,14 +67,14 @@ class Alignment(models.Model):
         blank=True
     )
 
-    timestamps = ArrayField(
-        ArrayField(
-            models.CharField(max_length=20, blank=True, null=True),
-            size=2
-        ),
-        null=True,
-        blank=True
-    )
+    # timestamps = ArrayField(
+    #     ArrayField(
+    #         models.CharField(max_length=20, blank=True, null=True),
+    #         size=2
+    #     ),
+    #     null=True,
+    #     blank=True
+    # )
 
     created_at = models.DateTimeField(
         _('created at'),

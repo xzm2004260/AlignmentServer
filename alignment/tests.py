@@ -2,6 +2,7 @@ import io
 from rest_framework import status
 from django.urls import reverse
 from rest_framework.test import APITestCase
+import pytest
 
 from .models import Alignment
 
@@ -16,36 +17,38 @@ class AlignmentTestCase(APITestCase):
     def _create_test_file():
         return io.StringIO("this is a test file!")
 
-    def setUp(self):
+    @pytest.mark.django_db
+    def setUp(self):    
         self.alignment_data = {
             'title': 'test title 2',
             'accompaniment': 2,
             'level': 1,
             'lyrics': self._create_test_file()
          }
+        self.post_response = self.client.post(reverse('create-alignment'), self.alignment_data)
 
-        self.response = self.client.post(
-            reverse('create-alignment'),
-            self.alignment_data)
 
-    def test_api_create_alignment(self):
+    
+    @pytest.mark.django_db
+    def test_api_post_alignment(self):
         """
         Test the api has alignment creation capability.
 
         Command:
-        python manage.py test alignment.tests.AlignmentTestCase.test_api_create_alignment
+        pytest alignment/tests
 
         """
 
-        self.assertEqual(self.response.status_code, status.HTTP_200_OK)
+        print(self.post_response.json() )
+        self.assertEqual(self.post_response.status_code, status.HTTP_200_OK)
 
+    @pytest.mark.django_db
     def test_api_get_alignment(self):
         """
         Test the api to get an alignment.
 
         Command:
-        python manage.py test alignment.tests.AlignmentTestCase.test_api_get_alignment
-
+        pytest alignment/tests
 
         """
 
@@ -54,4 +57,6 @@ class AlignmentTestCase(APITestCase):
             reverse('alignment-detail', kwargs={'pk': align.pk}),
             format='json'
         )
+        self.assertEqual(len(response.json()), 6) # an alignment object has 6 fields
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)

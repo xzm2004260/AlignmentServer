@@ -26,7 +26,22 @@ class AlignmentTestCase(APITestCase):
             'lyrics': self._create_test_file()
          }
         self.post_response = self.client.post(reverse('create-alignment'), self.alignment_data)
+    
+    @pytest.mark.django_db
+    def test_api_create_alignment(self):
+        """
+        Test the api has alignment creation capability.
 
+        Command:
+        pytest alignment/tests
+
+        """
+        self.alignment_data = {
+            'title': 'test title 2',
+            'accompaniment': 2,
+            'composition_id':1}
+        print(self.post_response.status_code)
+        self.assertEqual(self.post_response.status_code, status.HTTP_400_)
 
     
     @pytest.mark.django_db

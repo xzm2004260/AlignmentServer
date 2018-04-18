@@ -5,6 +5,8 @@ from rest_framework import status
 from rest_framework.exceptions import NotFound
 from .serializer import AlignmentSerializer, AlignmentDetailSerializer
 from .models import Alignment
+from services.utils import get_file
+import os
 
 
 class CreateAlignmentAPIView(APIView):
@@ -16,7 +18,6 @@ class CreateAlignmentAPIView(APIView):
     """
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = AlignmentSerializer
-
 
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -46,3 +47,23 @@ class AlignmentDetailAPIView(APIView):
         obj = self.get_object()
         serializer = AlignmentDetailSerializer(obj)
         return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+class UploadAPIView(APIView):
+
+    """
+    POST:
+        Get a new audio instance.
+
+    """
+
+    def post(self, request):
+
+        recording_URL = request.data['recording_URL']
+        alignment_id = request.data['alignment_id']
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        outputDir = os.path.join(dir_path, 'recordings/')
+        get_file(recording_URL, alignment_id, outputDir)
+
+        return Response( status=status.HTTP_200_OK)
+

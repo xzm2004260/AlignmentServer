@@ -59,11 +59,11 @@ class UploadAPIView(APIView):
 
     def post(self, request):
 
-        recording_URL = request.data['recording_URL']
+        recording_url = request.data['recording_URL']
         alignment_id = request.data['alignment_id']
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        outputDir = os.path.join(dir_path, 'recordings/')
-        get_file(recording_URL, alignment_id, outputDir)
+        output_dir = os.path.join(dir_path, 'recordings/')
+        get_file(recording_url, alignment_id, output_dir)
 
         return Response( status=status.HTTP_200_OK)
 

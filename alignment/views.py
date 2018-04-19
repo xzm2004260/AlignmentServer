@@ -3,7 +3,11 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-from .serializer import AlignmentSerializer, AlignmentDetailSerializer
+from .serializer import (
+    AlignmentSerializer,
+    AlignmentDetailSerializer,
+    UploadAudioSerializer
+)
 from .models import Alignment
 from services.utils import get_file
 import os
@@ -59,11 +63,13 @@ class UploadAPIView(APIView):
 
     def post(self, request):
 
-        recording_url = request.data['recording_URL']
-        alignment_id = request.data['alignment_id']
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-        output_dir = os.path.join(dir_path, 'recordings/')
-        get_file(recording_url, alignment_id, output_dir)
-
-        return Response( status=status.HTTP_200_OK)
+        serializer = UploadAudioSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            recording_url = request.data['recording_URL']
+            alignment_id = request.data['alignment_id']
+            dir_path = os.path.dirname(os.path.realpath(__file__))
+            output_dir = os.path.join(dir_path, 'recordings/')
+            get_file(recording_url, alignment_id, output_dir)
+            return Response("Uploaded Successfully", status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 

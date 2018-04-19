@@ -136,6 +136,7 @@ class UploadAudioTestCase(APITestCase):
 
         post_response = self.client.post(reverse('upload-audio'), data_upload) # upload audio
         self.assertEqual(post_response.status_code, status.HTTP_200_OK)
+        # check if file on server
 
     # # calls  AlignmentTestCase.setUp(self):
     # def test_api_upload_wrong(self):

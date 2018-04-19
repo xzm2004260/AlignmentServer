@@ -36,7 +36,7 @@ class Alignment(models.Model):
             (DONE, 'DONE'),
         )
 
-    composition = models.OneToOneField(
+    composition = models.ForeignKey(
         Composition,
         blank=True,
         null=True,

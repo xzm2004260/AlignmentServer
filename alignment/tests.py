@@ -5,7 +5,7 @@ from rest_framework.test import APITestCase
 import pytest
 
 from .models import Alignment
-
+from .models import Composition
 
 class AlignmentTestCase(APITestCase):
     """
@@ -20,29 +20,20 @@ class AlignmentTestCase(APITestCase):
     @pytest.mark.django_db
     def setUp(self):    
         self.alignment_data = {
-            'title': 'test title 2',
+            'title': 'new composition',
             'accompaniment': 2,
             'level': 1,
             'lyrics': self._create_test_file()
-         }
-        self.post_response = self.client.post(reverse('create-alignment'), self.alignment_data)
+         }    
+
     
-    @pytest.mark.django_db
-    def test_api_create_alignment(self):
-        """
-        Test the api has alignment creation capability.
 
-        Command:
-        pytest alignment/tests
-
-        """
-        self.alignment_data = {
+        self.alignment_data_wrong_comp_id = {
             'title': 'test title 2',
             'accompaniment': 2,
-            'composition_id':1}
-        print(self.post_response.status_code)
-        self.assertEqual(self.post_response.status_code, status.HTTP_400_)
-
+            'level': 1,
+            'composition_id': -1
+         } 
     
     @pytest.mark.django_db
     def test_api_post_alignment(self):
@@ -53,9 +44,58 @@ class AlignmentTestCase(APITestCase):
         pytest alignment/tests
 
         """
+        pre_post_count_aligns = Alignment.objects.count()
+        pre_post_count_compositions = Composition.objects.count()
+        
+        post_response = self.client.post(reverse('create-alignment'), self.alignment_data) # create one alignment object
+        # print(self.post_response.json() )
+        num_aligns_added = Alignment.objects.count() - pre_post_count_aligns
+        num_compositions_added = Composition.objects.count() - pre_post_count_compositions
+        
+        self.assertEqual(num_aligns_added, 1)
+        self.assertEqual(num_compositions_added, 1)
+        self.assertEqual(post_response.status_code, status.HTTP_200_OK)
 
-        print(self.post_response.json() )
-        self.assertEqual(self.post_response.status_code, status.HTTP_200_OK)
+    @pytest.mark.django_db
+    def test_api_post_alignment_by_comp_id(self):
+        """
+        Command:
+        pytest alignment/tests
+
+        """
+
+        self.client.post(reverse('create-alignment'), self.alignment_data) # create one alignment object
+
+        pre_post_count_aligns = Alignment.objects.count()
+        pre_post_count_compositions = Composition.objects.count()
+        
+        query_set = Composition.objects.filter(title='new composition')
+        self.assertEqual(Composition.objects.count(), 1)
+
+        composition = query_set[0] # there is only one composition with this name
+
+        comp_id = composition.id
+        alignment_data_by_comp_id = {
+            'title': 'test title 2',
+            'accompaniment': 2,
+            'level': 1,
+            'composition_id': comp_id
+         } 
+        post_response = self.client.post(reverse('create-alignment'), alignment_data_by_comp_id) # create one alignment object
+        # print(self.post_response.json() )
+        num_aligns_added = Alignment.objects.count() - pre_post_count_aligns
+        num_compositions_added = Composition.objects.count() - pre_post_count_compositions
+        
+        self.assertEqual(post_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(num_aligns_added, 1)
+        self.assertEqual(num_compositions_added, 0)
+        
+
+    @pytest.mark.django_db
+    def test_api_post_alignment_wrong_id(self):
+
+        post_response = self.client.post(reverse('create-alignment'), self.alignment_data_wrong_comp_id) # create one alignment object
+        self.assertEqual(post_response.status_code, status.HTTP_404_NOT_FOUND)        
 
     @pytest.mark.django_db
     def test_api_get_alignment(self):
@@ -66,6 +106,7 @@ class AlignmentTestCase(APITestCase):
         pytest alignment/tests
 
         """
+        self.post_response = self.client.post(reverse('create-alignment'), self.alignment_data) # create one alignment object
 
         align = Alignment.objects.get(id=1)
         response = self.client.get(

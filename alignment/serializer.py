@@ -3,6 +3,7 @@ from .models import Alignment
 from composition.models import Composition
 from rest_framework import status
 from services import exceptions
+from django.core.validators import URLValidator
 from django.db import IntegrityError, transaction
 
 
@@ -90,3 +91,28 @@ class AlignmentDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Alignment
         fields = '__all__'
+
+
+class UploadAudioSerializer(serializers.Serializer):
+    recording_url = serializers.URLField(required=True)
+    alignment_id = serializers.IntegerField(required=True)
+
+    class Meta:
+        fields = ['url', 'alignment_id']
+
+    def validated_url(value):
+        try:
+            validator = URLValidator()
+            validator(value)
+        except serializers.ValidationError:
+            raise serializers.ValidationError('Please enter a valid URL.')
+        return value
+
+    def validated_alignment_id(value):
+        try:
+            Alignment.objects.get(id=value)
+
+        except Alignment.DoesNotExist:
+            raise 'Alignment does not exist'
+        return value
+

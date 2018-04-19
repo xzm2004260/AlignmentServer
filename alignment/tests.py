@@ -35,7 +35,7 @@ class AlignmentTestCase(APITestCase):
             'level': 1,
             'composition_id': -1
          } 
-    
+
     
     @pytest.mark.django_db
     def test_api_post_alignment(self):
@@ -56,6 +56,7 @@ class AlignmentTestCase(APITestCase):
         self.assertEqual(num_aligns_added, 1)
         self.assertEqual(num_compositions_added, 1)
 
+
     @pytest.mark.django_db
     def test_api_post_alignment_by_comp_id(self):
         """
@@ -64,11 +65,11 @@ class AlignmentTestCase(APITestCase):
 
         """
 
-    
         pre_post_count_aligns = Alignment.objects.count()
         pre_post_count_compositions = Composition.objects.count()
         
         query_set = Composition.objects.filter(title=self.alignment_data['title']) # get the just uploaded composition
+
         self.assertEqual(Composition.objects.count(), 1)
 
         composition = query_set[0] # there is only one composition with this name
@@ -94,6 +95,7 @@ class AlignmentTestCase(APITestCase):
     def test_api_post_alignment_wrong_id(self):
 
         post_response = self.client.post(reverse('create-alignment'), self.alignment_data_by_comp_id) # create one alignment object
+
         self.assertEqual(post_response.status_code, status.HTTP_404_NOT_FOUND)        
 
     @pytest.mark.django_db

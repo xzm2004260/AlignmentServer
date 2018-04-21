@@ -3,9 +3,10 @@ from rest_framework import status
 from django.urls import reverse
 from rest_framework.test import APITestCase
 import pytest
-
+from urllib import parse
 from .models import Alignment
 from .models import Composition
+
 
 class AlignmentTestCase(APITestCase):
     """
@@ -14,8 +15,15 @@ class AlignmentTestCase(APITestCase):
     """
 
     @staticmethod
-    def _create_test_file():
+    def _create_test_file_():
         return io.StringIO("this is a test file!")
+
+    @staticmethod
+    def _create_test_file(path):
+        with open(path, 'w') as f:
+            f.write('test123\n')
+        f = open(path, 'rb')
+        return f
 
     @pytest.mark.django_db
     def setUp(self):    
@@ -23,11 +31,11 @@ class AlignmentTestCase(APITestCase):
             'title': 'new composition',
             'accompaniment': 2,
             'level': 1,
-            'lyrics': self._create_test_file()
+            'lyrics': self._create_test_file('tmp/test_file.txt')
          }
         self.pre_post_count_aligns = Alignment.objects.count()
         self.pre_post_count_compositions = Composition.objects.count()    
-        self.post_response = self.client.post(reverse('create-alignment'), self.alignment_data) # create one alignment object
+        self.post_response = self.client.post(reverse('create-alignment'), self.alignment_data, format='multipart') # create one alignment object
 
         self.alignment_data_by_comp_id = {
             'title': 'test title 2',
@@ -52,8 +60,12 @@ class AlignmentTestCase(APITestCase):
         num_aligns_added = Alignment.objects.count() - self.pre_post_count_aligns
         num_compositions_added = Composition.objects.count() - self.pre_post_count_compositions
 
-        self.assertEqual(self.post_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.post_response.status_code, status.HTTP_201_CREATED)
+        # self.assertTrue(parse(self.post_response.data['lyrics']).path.startswith(settings.MEDIA_URL))
+        self.assertIn('alignment_id', self.post_response.data)
         self.assertEqual(num_aligns_added, 1)
+
+        self.assertIn('lyrics_id', self.post_response.data)
         self.assertEqual(num_compositions_added, 1)
 
 
@@ -86,7 +98,7 @@ class AlignmentTestCase(APITestCase):
         num_aligns_added = Alignment.objects.count() - pre_post_count_aligns
         num_compositions_added = Composition.objects.count() - pre_post_count_compositions
         
-        self.assertEqual(post_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(num_aligns_added, 1)
         self.assertEqual(num_compositions_added, 0)
         

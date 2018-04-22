@@ -12,7 +12,7 @@ class AlignmentSerializer(serializers.Serializer):
     accompaniment = serializers.IntegerField(required=True)
     level = serializers.IntegerField(required=False)
     composition_id = serializers.UUIDField(required=False, default=None)
-    lyrics = serializers.FileField(required=True)
+    lyrics = serializers.FileField(required=False)
 
     class Meta:
         fields = '__all__'
@@ -48,7 +48,7 @@ class AlignmentSerializer(serializers.Serializer):
     def create(self, validated_data):
         accompaniment = validated_data.pop('accompaniment')
 
-        if validated_data['lyrics']:
+        if self.validated_data.get('lyrics', None):
             lyrics = validated_data.pop('lyrics')
 
             try:
@@ -60,7 +60,7 @@ class AlignmentSerializer(serializers.Serializer):
             except IntegrityError as e:
                 raise e.message
 
-        elif validated_data['composition_id']:
+        elif self.validated_data.get('composition_id'):
             try:
                 composition_object = Composition.objects.get(id=validated_data['composition_id'])
 
@@ -84,7 +84,7 @@ class AlignmentSerializer(serializers.Serializer):
         :return: dict values
 
         """
-        return {'alignment_id': instance.id, 'lyrics_id': instance.composition_id}
+        return {'alignment_id': instance.id, 'composition_id': instance.composition_id}
 
 
 class AlignmentDetailSerializer(serializers.ModelSerializer):

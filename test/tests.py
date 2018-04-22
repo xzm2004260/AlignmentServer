@@ -1,23 +1,24 @@
 import io
+import os
 from rest_framework import status
 from django.urls import reverse
 from rest_framework.test import APITestCase
 import pytest
 from urllib import parse
-from ../alignment.models import Alignment
-from ../composition.models import Composition
+from alignment.models import Alignment
+from composition.models import Composition
 
+PATH_TEST = os.path.dirname(os.path.realpath(__file__)) 
 
 class AlignmentTestCase(APITestCase):
     """
     Test suite for the api views.
 
     """
-
     @pytest.mark.django_db
     def setUp(self):
         
-        f = open('test_data/test_file.txt', 'r')
+        f = open(os.path.join(PATH_TEST, 'test_file.txt'), 'r')
         self.alignment_data = {
             'title': 'new composition',
             'accompaniment': 2,

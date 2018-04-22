@@ -4,8 +4,8 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 import pytest
 from urllib import parse
-from ../alignment.models import Alignment
-from ../composition.models import Composition
+from alignment.models import Alignment
+from composition.models import Composition
 
 
 class AlignmentTestCase(APITestCase):

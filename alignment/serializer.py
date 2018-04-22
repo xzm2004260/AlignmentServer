@@ -64,7 +64,7 @@ class AlignmentSerializer(serializers.Serializer):
             try:
                 composition_object = Composition.objects.get(id=validated_data['composition_id'])
 
-            except Alignment.DoesNotExist:
+            except Composition.DoesNotExist:
                 return status.HTTP_404_NOT_FOUND
 
         else:
@@ -115,4 +115,3 @@ class UploadAudioSerializer(serializers.Serializer):
         except Alignment.DoesNotExist:
             raise 'Alignment does not exist'
         return value
-

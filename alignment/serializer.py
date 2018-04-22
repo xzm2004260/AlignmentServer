@@ -47,15 +47,16 @@ class AlignmentSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         accompaniment = validated_data.pop('accompaniment')
-        level = validated_data.pop('level') if validated_data['level'] else None
 
         if validated_data['lyrics']:
-            title = validated_data.pop('title') if validated_data['title'] else None
             lyrics = validated_data.pop('lyrics')
 
             try:
                 with transaction.atomic():
-                    composition_object = Composition.objects.create(lyrics=lyrics, title=title)
+                    if self.validated_data.get('title', None):
+                        composition_object = Composition.objects.create(lyrics=lyrics, title=validated_data.pop('title'))
+                    else:
+                        composition_object = Composition.objects.create(lyrics=lyrics)
             except IntegrityError as e:
                 raise e.message
 
@@ -69,13 +70,12 @@ class AlignmentSerializer(serializers.Serializer):
         else:
             raise exceptions.DataNotProvided
 
-        alignment = Alignment.objects.create(composition=composition_object, accompaniment=accompaniment, level=level)
+        if self.validated_data.get('level', None):
+            alignment = Alignment.objects.create(composition=composition_object, accompaniment=accompaniment, level=validated_data.pop('level'))
+        else:
+            alignment = Alignment.objects.create(composition=composition_object, accompaniment=accompaniment)
+
         return alignment
-
-
-
-
-
 
     def to_representation(self, instance):
         """

@@ -18,12 +18,12 @@ class AlignmentTestCase(APITestCase):
     @pytest.mark.django_db
     def setUp(self):
         
-        f = open(os.path.join(PATH_TEST, 'test_file.txt'), 'r')
+        self.f = open(os.path.join(PATH_TEST, 'test_file.txt'), 'r')
         self.alignment_data = {
             'title': 'new composition',
             'accompaniment': 2,
             'level': 1,
-            'lyrics': f
+            'lyrics': self.f
          }
         self.pre_post_count_aligns = Alignment.objects.count()
         self.pre_post_count_compositions = Composition.objects.count()    
@@ -36,6 +36,24 @@ class AlignmentTestCase(APITestCase):
             'composition_id': -1
          } 
 
+    def test_not_complete_data(self):
+        '''
+        tests missing required fields
+        '''
+        not_complete_data_variants = [
+        {
+            'lyrics': self.f
+        },
+        {
+            'accompaniment': 2
+        },
+        {
+            'composition_id':1
+        }
+        ]
+        for not_complete_data in not_complete_data_variants:
+            post_response = self.client.post(reverse('create-alignment'), not_complete_data, format='multipart') # create one alignment object
+            self.assertEqual(post_response.status_code, status.HTTP_400_BAD_REQUEST)
     
     @pytest.mark.django_db
     def test_api_post_alignment(self):
@@ -56,6 +74,8 @@ class AlignmentTestCase(APITestCase):
 
         self.assertIn('lyrics_id', self.post_response.data)
         self.assertEqual(num_compositions_added, 1)
+
+
 
 
     @pytest.mark.django_db

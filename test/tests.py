@@ -160,20 +160,20 @@ class UploadAudioTestCase(APITestCase):
         }
 
         post_response = self.client.post(reverse('upload-audio'), data_upload) # upload audio
-        self.assertEqual(post_response.status_code, status.HTTP_200_OK)
-        # check if file on server
+        self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
+        # check manually if file on server
 
-    # # calls  AlignmentTestCase.setUp(self):
-    # def test_api_upload_wrong(self):
-    #     '''
-    #     tests uploading audio to non-existing alignment_id
-    #     '''
-    #     recording_URL = 'http://htftp.offroadsz.com/marinhaker/drugi/mp3/Soundtrack%20-%20Rocky/Rocky%20IV%20(1985)/01%20-%20Survivor%20-%20Burning%20Heart.mp3'
+    # calls  AlignmentTestCase.setUp(self):
+    def test_api_upload_wrong_id(self):
+        '''
+        tests uploading audio to non-existing alignment_id
+        '''
+        recording_URL = 'http://htftp.offroadsz.com/marinhaker/drugi/mp3/Soundtrack%20-%20Rocky/Rocky%20IV%20(1985)/01%20-%20Survivor%20-%20Burning%20Heart.mp3'
 
-    #     data_upload = {
-    #     'recording_URL' : recording_URL,
-    #     'alignment_id': -1
-    #     }
+        data_upload = {
+        'recording_URL' : recording_URL,
+        'alignment_id': -1
+        }
 
-    #     post_response = self.client.post(reverse('upload-audio'), data_upload) # upload audio
-    #     self.assertEqual(post_response.status_code, status.HTTP_404_NOT_FOUND)
+        post_response = self.client.post(reverse('upload-audio'), data_upload) # upload audio
+        self.assertEqual(post_response.status_code, status.HTTP_404_NOT_FOUND)

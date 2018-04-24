@@ -19,9 +19,5 @@ class Composition(models.Model):
         verbose_name_plural = _('compositions')
         db_table = 'composition'
 
-    def __str__(self):
-        return self.title
-
-
 
 

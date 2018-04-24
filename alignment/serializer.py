@@ -1,17 +1,17 @@
 from rest_framework import serializers
 from .models import Alignment
 from composition.models import Composition
-from rest_framework import status
 from services import exceptions
 from django.core.validators import URLValidator
 from django.db import IntegrityError, transaction
+from rest_framework.exceptions import NotFound
 
 
 class AlignmentSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=100, required=False)
     accompaniment = serializers.IntegerField(required=True)
     level = serializers.IntegerField(required=False)
-    composition_id = serializers.UUIDField(required=False, default=None)
+    composition_id = serializers.CharField(max_length=100, required=False, default=None)
     lyrics = serializers.FileField(required=False)
 
     class Meta:
@@ -60,12 +60,11 @@ class AlignmentSerializer(serializers.Serializer):
             except IntegrityError as e:
                 raise e.message
 
-        elif self.validated_data.get('composition_id'):
+        elif self.validated_data.get('composition_id', None):
             try:
-                composition_object = Composition.objects.get(id=validated_data['composition_id'])
-
-            except Composition.DoesNotExist:
-                return status.HTTP_404_NOT_FOUND
+                composition_object = Composition.objects.get(id=validated_data.pop('composition_id'))
+            except Exception:
+                raise exceptions.CompositionException
 
         else:
             raise exceptions.DataNotProvided

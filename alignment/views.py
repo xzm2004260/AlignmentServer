@@ -65,7 +65,7 @@ class UploadAPIView(APIView):
 
         serializer = UploadAudioSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            recording_url = request.data['recording_URL']
+            recording_url = request.data['recording_url']
             alignment_id = request.data['alignment_id']
             dir_path = os.path.dirname(os.path.realpath(__file__))
             output_dir = os.path.join(dir_path, 'recordings/')

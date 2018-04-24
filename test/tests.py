@@ -10,6 +10,7 @@ from composition.models import Composition
 
 PATH_TEST = os.path.dirname(os.path.realpath(__file__)) 
 
+
 class AlignmentTestCase(APITestCase):
     """
     Test suite for the api views.
@@ -17,7 +18,7 @@ class AlignmentTestCase(APITestCase):
     """
     @pytest.mark.django_db
     def setUp(self):
-        
+
         self.f = open(os.path.join(PATH_TEST, 'test_file.txt'), 'r')
         self.alignment_data = {
             'title': 'new composition',
@@ -25,7 +26,7 @@ class AlignmentTestCase(APITestCase):
             'lyrics': self.f
          }
         self.pre_post_count_aligns = Alignment.objects.count()
-        self.pre_post_count_compositions = Composition.objects.count()    
+        self.pre_post_count_compositions = Composition.objects.count()
         self.post_response = self.client.post(reverse('create-alignment'), self.alignment_data, format='multipart') # create one alignment object
 
         self.alignment_data_by_comp_id = {
@@ -33,12 +34,12 @@ class AlignmentTestCase(APITestCase):
             'accompaniment': 2,
             'level': 1,
             'composition_id': -1
-         } 
+         }
 
     def test_not_complete_data(self):
-        '''
-        tests missing required fields
-        '''
+
+        """Tests missing required fields."""
+
         not_complete_data_variants = [
         {
             'lyrics': self.f
@@ -53,7 +54,7 @@ class AlignmentTestCase(APITestCase):
         for not_complete_data in not_complete_data_variants:
             post_response = self.client.post(reverse('create-alignment'), not_complete_data, format='multipart') # create one alignment object
             self.assertEqual(post_response.status_code, status.HTTP_400_BAD_REQUEST)
-    
+
     @pytest.mark.django_db
     def test_api_post_alignment(self):
         """
@@ -71,11 +72,8 @@ class AlignmentTestCase(APITestCase):
         self.assertIn('alignment_id', self.post_response.data)
         self.assertEqual(num_aligns_added, 1)
 
-        self.assertIn('lyrics_id', self.post_response.data)
+        # self.assertIn('lyrics', self.post_response.data)
         self.assertEqual(num_compositions_added, 1)
-
-
-
 
     @pytest.mark.django_db
     def test_api_post_alignment_by_comp_id(self):
@@ -87,7 +85,7 @@ class AlignmentTestCase(APITestCase):
 
         pre_post_count_aligns = Alignment.objects.count()
         pre_post_count_compositions = Composition.objects.count()
-        
+
         query_set = Composition.objects.filter(title=self.alignment_data['title']) # get the just uploaded composition
 
         self.assertEqual(Composition.objects.count(), 1)
@@ -100,23 +98,23 @@ class AlignmentTestCase(APITestCase):
             'accompaniment': 2,
             'level': 1,
             'composition_id': comp_id
-         } 
+         }
         post_response = self.client.post(reverse('create-alignment'), alignment_data_by_comp_id) # create one alignment object
         # print(self.post_response.json() )
         num_aligns_added = Alignment.objects.count() - pre_post_count_aligns
         num_compositions_added = Composition.objects.count() - pre_post_count_compositions
-        
+
         self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(num_aligns_added, 1)
         self.assertEqual(num_compositions_added, 0)
-        
+
 
     @pytest.mark.django_db
     def test_api_post_alignment_wrong_id(self):
 
         post_response = self.client.post(reverse('create-alignment'), self.alignment_data_by_comp_id) # create one alignment object
 
-        self.assertEqual(post_response.status_code, status.HTTP_404_NOT_FOUND)        
+        self.assertEqual(post_response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_api_get_alignment(self):
         """
@@ -145,17 +143,24 @@ class UploadAudioTestCase(APITestCase):
 
     @pytest.mark.django_db
     def setUp(self):
-        atc = AlignmentTestCase() 
+        self.f = open(os.path.join(PATH_TEST, 'test_file.txt'), 'r')
+
+        self.alignment_data = {
+            'title': 'new composition',
+            'accompaniment': 2,
+            'lyrics': self.f
+        }
+        self.response = self.client.post(reverse('create-alignment'), self.alignment_data)
 
     # calls  AlignmentTestCase.setUp(self):
     def test_api_upload_audio(self):
-        '''
-        tests uploading audio to server
-        '''
-        recording_URL = 'http://htftp.offroadsz.com/marinhaker/drugi/mp3/Soundtrack%20-%20Rocky/Rocky%20IV%20(1985)/01%20-%20Survivor%20-%20Burning%20Heart.mp3'
+
+        """Tests uploading audio to server."""
+
+        recording_url = 'http://htftp.offroadsz.com/marinhaker/drugi/mp3/Soundtrack%20-%20Rocky/Rocky%20IV%20(1985)/01%20-%20Survivor%20-%20Burning%20Heart.mp3'
 
         data_upload = {
-        'recording_URL' : recording_URL,
+        'recording_url' : recording_url,
         'alignment_id': 1
         }
 
@@ -165,15 +170,33 @@ class UploadAudioTestCase(APITestCase):
 
     # calls  AlignmentTestCase.setUp(self):
     def test_api_upload_wrong_id(self):
-        '''
-        tests uploading audio to non-existing alignment_id
-        '''
-        recording_URL = 'http://htftp.offroadsz.com/marinhaker/drugi/mp3/Soundtrack%20-%20Rocky/Rocky%20IV%20(1985)/01%20-%20Survivor%20-%20Burning%20Heart.mp3'
+
+        """Tests uploading audio to non-existing alignment_id."""
+
+        recording_url = 'http://htftp.offroadsz.com/marinhaker/drugi/mp3/Soundtrack%20-%20Rocky/Rocky%20IV%20(1985)/01%20-%20Survivor%20-%20Burning%20Heart.mp3'
 
         data_upload = {
-        'recording_URL' : recording_URL,
-        'alignment_id': -1
+            'recording_url': recording_url,
+            'alignment_id': -1
         }
 
         post_response = self.client.post(reverse('upload-audio'), data_upload) # upload audio
         self.assertEqual(post_response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_api_upload_not_complete_data(self):
+
+        """Tests missing required fields."""
+
+        self.not_complete_data_variants = [
+            {
+                'alignment_id': self.response.json()['alignment_id']
+            },
+            {
+                'recording_url': 'http://htftp.offroadsz.com/marinhaker/drugi/mp3/Soundtrack%20-%20Rocky/Rocky%20IV%20(1985)/01%20-%20Survivor%20-%20Burning%20Heart.mp3'
+            }
+        ]
+
+        for data in self.not_complete_data_variants:
+            post_response = self.client.post(reverse('upload-audio'), data)
+            self.assertEqual(post_response.status_code, status.HTTP_400_BAD_REQUEST)
+            # self.assertEqual(self.response.json()['alignment_id'], 8)

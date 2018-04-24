@@ -22,7 +22,6 @@ class AlignmentTestCase(APITestCase):
         self.alignment_data = {
             'title': 'new composition',
             'accompaniment': 2,
-            'level': 1,
             'lyrics': self.f
          }
         self.pre_post_count_aligns = Alignment.objects.count()
@@ -119,7 +118,6 @@ class AlignmentTestCase(APITestCase):
 
         self.assertEqual(post_response.status_code, status.HTTP_404_NOT_FOUND)        
 
-    @pytest.mark.django_db
     def test_api_get_alignment(self):
         """
         Test the api to get an alignment.
@@ -135,8 +133,12 @@ class AlignmentTestCase(APITestCase):
             reverse('alignment-detail', kwargs={'pk': align.pk}),
             format='json'
         )
-        self.assertEqual(len(response.json()), 6) # an alignment object has 6 fields
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(len(response.json()), 6) # an alignment object has 6 fields
+        self.assertEqual(response.json()['level'], 1) # an alignment level is set by defaul to 1 (=Words)
+        self.assertEqual(response.json()['status'], 1) # an alignment status is set by defaul to 1 (=Not started)
 
 
 class UploadAudioTestCase(APITestCase):

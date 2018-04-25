@@ -70,6 +70,6 @@ class UploadAPIView(APIView):
             dir_path = os.path.dirname(os.path.realpath(__file__))
             output_dir = os.path.join(dir_path, 'recordings/')
             get_file(recording_url, alignment_id, output_dir)
-            return Response("Uploaded Successfully", status=status.HTTP_200_OK)
+            return Response("Uploaded Successfully", status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 

@@ -160,8 +160,8 @@ class UploadAudioTestCase(APITestCase):
         recording_url = 'http://htftp.offroadsz.com/marinhaker/drugi/mp3/Soundtrack%20-%20Rocky/Rocky%20IV%20(1985)/01%20-%20Survivor%20-%20Burning%20Heart.mp3'
 
         data_upload = {
-        'recording_url' : recording_url,
-        'alignment_id': 1
+            'recording_url': recording_url,
+            'alignment_id': self.response.json()['alignment_id']
         }
 
         post_response = self.client.post(reverse('upload-audio'), data_upload) # upload audio

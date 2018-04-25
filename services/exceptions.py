@@ -9,3 +9,8 @@ class DataNotProvided(APIException):
 class CompositionException(APIException):
     status_code = 404
     default_detail = 'Given composition_id does not exist.'
+
+
+class AlignmentException(APIException):
+    status_code = 404
+    default_detail = 'Given alignment_id does not exist.'

@@ -97,9 +97,9 @@ class UploadAudioSerializer(serializers.Serializer):
     alignment_id = serializers.IntegerField(required=True)
 
     class Meta:
-        fields = ['url', 'alignment_id']
+        fields = ['recording_url', 'alignment_id']
 
-    def validated_url(value):
+    def validate_recording_url(self, value):
         try:
             validator = URLValidator()
             validator(value)
@@ -107,10 +107,10 @@ class UploadAudioSerializer(serializers.Serializer):
             raise serializers.ValidationError('Please enter a valid URL.')
         return value
 
-    def validated_alignment_id(value):
+    def validate_alignment_id(self, value):
         try:
             Alignment.objects.get(id=value)
 
-        except Alignment.DoesNotExist:
-            raise 'Alignment does not exist'
+        except Exception:
+            raise exceptions.AlignmentException
         return value

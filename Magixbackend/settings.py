@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'authentication',
     'alignment',
     'composition',
 ]
@@ -71,6 +72,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'Magixbackend.wsgi.application'
 
@@ -113,6 +115,9 @@ REST_FRAMEWORK = {
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
+
+
+# JWT_TOKEN_EXPIRY = 7
 
 LANGUAGE_CODE = 'en-us'
 

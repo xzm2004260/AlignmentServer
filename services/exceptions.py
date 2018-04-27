@@ -14,3 +14,9 @@ class CompositionException(APIException):
 class AlignmentException(APIException):
     status_code = 404
     default_detail = 'Given alignment_id does not exist.'
+
+
+class UserDoesNotExistsException(APIException):
+    status_code = 404
+    default_detail = "User Does Not Exists"
+

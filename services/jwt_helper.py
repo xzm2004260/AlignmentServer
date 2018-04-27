@@ -24,7 +24,7 @@ class JWTHelper:
         if user:
             data = {
                 "exp": datetime.utcnow() + timedelta(days=JWTHelper.JWT_TOKEN_EXPIRY),
-                "email": user.email
+                "username": user.username
                 # "password": user.password
             }
             token = jwt.encode(data, 'secret', algorithm=JWTHelper.JWT_ALGORITHM)
@@ -50,4 +50,4 @@ class JWTHelper:
         return user for the token given.
         """
         email_dict = jwt.decode(token, 'secret', algorithms=JWTHelper.JWT_ALGORITHM)
-        return User.objects.filter(email=email_dict["email"], password=email_dict["password"]).first()
+        return User.objects.filter(username=email_dict["username"]).first()

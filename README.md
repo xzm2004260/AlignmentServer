@@ -48,12 +48,14 @@ $ sudo vim local_settings.py
 $ cd ..
 $ python manage.py migrate
 ```
-- Create Superuser
+Create Superuser
+----------------
 ```sh
 $ python manage.py createsuperuser --username=mirza123 --email=mirza@gmail.com // unique username
-$ To add users login with superuser 127.0.0.1:8000/admin/
-$ Enter basic information about user including random password to create user.
-$ Assign unique username to the concerned clients so that they can change password with given username.
-$ After changing password, users can sign in.
-$ Expiry date of token will be 7 days from changing the password by user.
 ```
+- To add users login with superuser http://localhost:8000/admin/
+- Enter basic information about user including random password to create user.
+- Give unique username to the concerned clients so that they can change password with given username at 
+  endpoint http://localhost:8000/auth/password/change
+- After changing old password to new one, users can sign in at endpoint http://localhost:8000/auth/signin
+- Token will be expire after 7 days from sign in by user.

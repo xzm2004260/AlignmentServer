@@ -59,3 +59,7 @@ $ python manage.py createsuperuser --username=mirza123 --email=mirza@gmail.com /
   endpoint http://localhost:8000/auth/password/change
 - After changing old password to new one, users can sign in at endpoint http://localhost:8000/auth/signin
 - Token will be expire after 7 days from sign in by user.
+
+Documentation
+-------------
+- https://documenter.getpostman.com/view/2377788/magixbackend/RVu1JBf9

@@ -7,6 +7,7 @@ import pytest
 from urllib import parse
 from alignment.models import Alignment
 from composition.models import Composition
+from django.contrib.auth.models import User
 
 PATH_TEST = os.path.dirname(os.path.realpath(__file__)) 
 
@@ -18,13 +19,31 @@ class AlignmentTestCase(APITestCase):
     """
     @pytest.mark.django_db
     def setUp(self):
+        """Setup authentication and alignment creation."""
 
+        user = User.objects.create_user(username='mirza', email='mirza@gmail.com', password='old_pass')
+        user.is_active = False
+        user.save()
+        change_password_data = {
+            'username': 'mirza',
+            'password': 'new_pass'
+        }
+
+        response = self.client.post(reverse('password-change'), change_password_data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.post(reverse('signin'), change_password_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue('token' in response.data)
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
         self.f = open(os.path.join(PATH_TEST, 'test_file.txt'), 'r')
         self.alignment_data = {
             'title': 'new composition',
             'accompaniment': 2,
             'lyrics': self.f
          }
+
         self.pre_post_count_aligns = Alignment.objects.count()
         self.pre_post_count_compositions = Composition.objects.count()
         self.post_response = self.client.post(reverse('create-alignment'), self.alignment_data, format='multipart') # create one alignment object
@@ -100,7 +119,6 @@ class AlignmentTestCase(APITestCase):
             'composition_id': comp_id
          }
         post_response = self.client.post(reverse('create-alignment'), alignment_data_by_comp_id) # create one alignment object
-        # print(self.post_response.json() )
         num_aligns_added = Alignment.objects.count() - pre_post_count_aligns
         num_compositions_added = Composition.objects.count() - pre_post_count_compositions
 
@@ -108,12 +126,14 @@ class AlignmentTestCase(APITestCase):
         self.assertEqual(num_aligns_added, 1)
         self.assertEqual(num_compositions_added, 0)
 
-
     @pytest.mark.django_db
     def test_api_post_alignment_wrong_id(self):
+        post_response = self.client.post(reverse('create-alignment'), self.alignment_data_by_comp_id)
+        self.assertEqual(post_response.status_code, status.HTTP_404_NOT_FOUND)
 
-        post_response = self.client.post(reverse('create-alignment'), self.alignment_data_by_comp_id) # create one alignment object
-
+    @pytest.mark.django_db
+    def test_api_post_alignment_wrong_token(self):
+        post_response = self.client.post(reverse('create-alignment'), self.alignment_data_by_comp_id)
         self.assertEqual(post_response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_api_get_alignment(self):
@@ -143,6 +163,25 @@ class UploadAudioTestCase(APITestCase):
 
     @pytest.mark.django_db
     def setUp(self):
+        """Setup of authentication and alignment creation for uploading audio."""
+
+        user = User.objects.create_user(username='mirza', email='mirza@gmail.com', password='old_pass')
+        user.is_active = False
+        user.save()
+        change_password_data = {
+            'username': 'mirza',
+            'password': 'new_pass'
+        }
+
+        response = self.client.post(reverse('password-change'), change_password_data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.post(reverse('signin'), change_password_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue('token' in response.data)
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
         self.f = open(os.path.join(PATH_TEST, 'test_file.txt'), 'r')
 
         self.alignment_data = {
@@ -150,6 +189,7 @@ class UploadAudioTestCase(APITestCase):
             'accompaniment': 2,
             'lyrics': self.f
         }
+
         self.response = self.client.post(reverse('create-alignment'), self.alignment_data)
 
     # calls  AlignmentTestCase.setUp(self):
@@ -168,7 +208,6 @@ class UploadAudioTestCase(APITestCase):
         self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
         # check manually if file on server
 
-    # calls  AlignmentTestCase.setUp(self):
     def test_api_upload_wrong_id(self):
 
         """Tests uploading audio to non-existing alignment_id."""
@@ -199,4 +238,3 @@ class UploadAudioTestCase(APITestCase):
         for data in self.not_complete_data_variants:
             post_response = self.client.post(reverse('upload-audio'), data)
             self.assertEqual(post_response.status_code, status.HTTP_400_BAD_REQUEST)
-            # self.assertEqual(self.response.json()['alignment_id'], 8)

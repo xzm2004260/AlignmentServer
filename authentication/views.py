@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework import permissions
 from django.contrib.auth import authenticate
 from rest_framework import exceptions
-from datetime import datetime
+from django.utils import timezone
 from services.exceptions import UserDoesNotExistsException
 from authentication.serializer import UserSignInSerializer
 
@@ -64,7 +64,7 @@ class UserSignInAPIView(APIView):
 
         user = authenticate(username=username, password=password)
         if user and getattr(user, 'last_login', None) is None:
-            user.last_login = datetime.utcnow()
+            user.last_login = timezone.now()
             user.save()
             serializer = UserSignInSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)

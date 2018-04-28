@@ -4,7 +4,7 @@ from rest_framework import status
 from django.urls import reverse
 from rest_framework.test import APITestCase
 import pytest
-from urllib import parse
+from rest_framework.test import APIClient
 from alignment.models import Alignment
 from composition.models import Composition
 from django.contrib.auth.models import User
@@ -133,8 +133,10 @@ class AlignmentTestCase(APITestCase):
 
     @pytest.mark.django_db
     def test_api_post_alignment_wrong_token(self):
-        post_response = self.client.post(reverse('create-alignment'), self.alignment_data_by_comp_id)
-        self.assertEqual(post_response.status_code, status.HTTP_404_NOT_FOUND)
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Bearer mn432sjjkaoiherqwe')
+        post_response = client.post(reverse('create-alignment'), self.alignment_data_by_comp_id)
+        self.assertEqual(post_response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_api_get_alignment(self):
         """

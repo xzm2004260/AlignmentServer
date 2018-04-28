@@ -55,6 +55,7 @@ $ python manage.py createsuperuser --username=mirza123 --email=mirza@gmail.com /
 ```
 - To add users login with superuser http://localhost:8000/admin/
 - Enter basic information about user including random password to create user.
+  Uncheck the is_active of user so that when user change password then user will be active.
 - Give unique username to the concerned clients so that they can change password with given username at 
   endpoint http://localhost:8000/auth/password/change
 - After changing old password to new one, users can sign in at endpoint http://localhost:8000/auth/signin

@@ -32,12 +32,14 @@ class ChangePasswordView(APIView):
 
         try:
             user = User.objects.get(username=username)
-            if user:
+            if user and getattr(user, 'last_login', None) is None:
                 user.set_password(password)
+                user.is_active = True
                 user.save()
+                return Response("Password changed successfully.", status=status.HTTP_200_OK)
         except User.DoesNotExist:
             raise UserDoesNotExistsException()
-        return Response("Password changed successfully.", status=status.HTTP_200_OK)
+        return Response("Token expired.", status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserSignInAPIView(APIView):
@@ -61,13 +63,11 @@ class UserSignInAPIView(APIView):
         password = request.data.get('password', None)
 
         user = authenticate(username=username, password=password)
-        if not user.last_login:
-            if user:
-                user.last_login = datetime.utcnow()
-                user.save()
-                serializer = UserSignInSerializer(user)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response("Invalid Credentials", status=status.HTTP_404_NOT_FOUND)
-        raise exceptions.AuthenticationFailed('Already logged in or your token has expired.')
+        if user and getattr(user, 'last_login', None) is None:
+            user.last_login = datetime.utcnow()
+            user.save()
+            serializer = UserSignInSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response("Invalid Credentials or already logged in", status=status.HTTP_404_NOT_FOUND)
 
 

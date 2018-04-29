@@ -22,21 +22,22 @@ class AlignmentTestCase(APITestCase):
         """Setup authentication and alignment creation."""
 
         user = User.objects.create_user(username='mirza', email='mirza@gmail.com', password='old_pass')
-        user.is_active = False
+        user.is_active = True
         user.save()
-        change_password_data = {
+        password_data = {
             'username': 'mirza',
-            'password': 'new_pass'
+            'password': 'old_pass'
         }
 
-        response = self.client.post(reverse('password-change'), change_password_data, format='json')
+        # response = self.client.post(reverse('password-change'), change_password_data, format='json')
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response = self.client.post(reverse('signin'), change_password_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue('token' in response.data)
+        # self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.post(reverse('signin'), password_data, format='json')
+        # self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # self.assertTrue('token' in response.data)
         token = response.data['token']
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+        
         self.f = open(os.path.join(PATH_TEST, 'test_file.txt'), 'r')
         self.alignment_data = {
             'title': 'new composition',

@@ -4,6 +4,16 @@ from django.urls import reverse
 # from django.contrib.postgres.fields import ArrayField
 from composition.models import Composition
 
+class Status:
+        NOTSTARTED = 1
+        ONQUEUE = 2
+        DONE = 3
+
+        Choices = (
+            (NOTSTARTED, 'NOTSTARTED'),
+            (ONQUEUE, 'ONQUEUE'),
+            (DONE, 'DONE'),
+        )
 
 class Alignment(models.Model):
 
@@ -25,16 +35,7 @@ class Alignment(models.Model):
             (LINES, 'LINES'),
         )
 
-    class Status:
-        NOTSTARTED = 1
-        ONQUEUE = 2
-        DONE = 3
-
-        Choices = (
-            (NOTSTARTED, 'NOTSTARTED'),
-            (ONQUEUE, 'ONQUEUE'),
-            (DONE, 'DONE'),
-        )
+    
 
     composition = models.ForeignKey(
         Composition,
@@ -66,6 +67,8 @@ class Alignment(models.Model):
         null=True,
         blank=True
     )
+
+    timestamps  = models.TextField(_('timestamps'), blank=True, null=True)
 
     # timestamps = ArrayField(
     #     ArrayField(

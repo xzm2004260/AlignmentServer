@@ -1,4 +1,3 @@
-import io
 import os
 from rest_framework import status
 from django.urls import reverse

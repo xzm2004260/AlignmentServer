@@ -14,6 +14,8 @@ from rest_framework import permissions
 from services.permissions import IsOwnerOrReadOnly
 from services.authentication import UserAuthentication
 import os
+from Magixbackend.settings import MEDIA_ROOT
+from alignment.thread_alignment import AlignThread
 
 
 class CreateAlignmentAPIView(APIView):
@@ -25,8 +27,8 @@ class CreateAlignmentAPIView(APIView):
     """
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = AlignmentSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-    authentication_classes = (UserAuthentication,)
+    # permission_classes = (permissions.IsAuthenticated,)
+    # authentication_classes = (UserAuthentication,)
 
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -45,8 +47,8 @@ class AlignmentDetailAPIView(APIView):
        Get an existing alignment instance against some id.
 
     """
-    permission_classes = (permissions.IsAuthenticated,)
-    authentication_classes = (UserAuthentication,)
+    # permission_classes = (permissions.IsAuthenticated,)
+    # authentication_classes = (UserAuthentication,)
 
     def get_object(self):
         try:
@@ -67,8 +69,8 @@ class UploadAPIView(APIView):
         Get a new audio instance.
 
     """
-    permission_classes = (permissions.IsAuthenticated,)
-    authentication_classes = (UserAuthentication,)
+    # permission_classes = (permissions.IsAuthenticated,)
+    # authentication_classes = (UserAuthentication,)
 
     def post(self, request):
 
@@ -76,9 +78,11 @@ class UploadAPIView(APIView):
         if serializer.is_valid(raise_exception=True):
             recording_url = request.data['recording_url']
             alignment_id = request.data['alignment_id']
-            dir_path = os.path.dirname(os.path.realpath(__file__))
-            output_dir = os.path.join(dir_path, 'recordings/')
+#             dir_path = os.path.dirname(os.path.realpath(__file__))
+            output_dir = os.path.join(MEDIA_ROOT, 'recordings/')
             get_file(recording_url, alignment_id, output_dir)
+            align_thread = AlignThread(alignment_id) 
+            align_thread.start()
             return Response("Uploaded Successfully", status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 

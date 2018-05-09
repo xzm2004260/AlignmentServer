@@ -22,7 +22,7 @@ class AlignThread (threading.Thread):
         self.alignment_id = alignment_id
       
     def run(self):
-        logging.info ("Starting " + self.alignment_id)
+        logging.info ("Starting " + str(self.alignment_id))
         
         alignment = Alignment.objects.get(id=self.alignment_id)
         alignment.status = Status.ONQUEUE # update status alignment
@@ -36,7 +36,7 @@ class AlignThread (threading.Thread):
         
 #         if not os.path.exists(output_URI): # align
 #     detected_word_list =  align_CMU(audioFile_URI, lyrics_URI, output_URI, with_section_anno=0, vocal_intervals_URI=None ) #  align
-        time.sleep(10); detectedTokenList = [ [[['word1',0,2]],[['word2',2,3]]] ]
+        time.sleep(3); detectedTokenList = [ [[['word1',0,2]],[['word2',2,3]]] ]
         detectedTokenList = detectedTokenList[0] # one section only
 #             with open(output_URI, 'w') as f1:
 #                 json.dump(detectedTokenList, f1) 
@@ -46,5 +46,5 @@ class AlignThread (threading.Thread):
         alignment.timestamps = str(detectedTokenList)
         alignment.status = Status.DONE # update status alignment
         alignment.save()
-        logging.info ("Exiting " + self.alignment_id)
+        logging.info ("Exiting " + str(self.alignment_id))
 

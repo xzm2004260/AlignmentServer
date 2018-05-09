@@ -80,9 +80,9 @@ class UploadAPIView(APIView):
             alignment_id = request.data['alignment_id']
 #             dir_path = os.path.dirname(os.path.realpath(__file__))
             output_dir = os.path.join(MEDIA_ROOT, 'recordings/')
-            get_file(recording_url, alignment_id, output_dir)
+            get_file(recording_url, alignment_id, output_dir) # upload audio to server from recording URL
             align_thread = AlignThread(alignment_id) 
             align_thread.start()
-            return Response("Uploaded Successfully", status=status.HTTP_201_CREATED)
+            return Response("Audio uploaded successfully", status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 

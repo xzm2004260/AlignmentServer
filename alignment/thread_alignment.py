@@ -39,6 +39,7 @@ class AlignThread (threading.Thread):
             sys.exit('file {} does not exist'.format(self.recording_URI) )
         
 #         if not os.path.exists(output_URI): # align
+
         with_section_anno=0
         vocal_intervals_URI=None
 #         detected_word_list =  align_CMU(self.recording_URI, lyrics_URI, output_URI, with_section_anno, vocal_intervals_URI ) #  align

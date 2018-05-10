@@ -7,7 +7,6 @@ from rest_framework.test import APIClient
 from alignment.models import Alignment
 from composition.models import Composition
 from django.contrib.auth.models import User
-from Magixbackend.settings import MEDIA_ROOT
 
 PATH_TEST = os.path.dirname(os.path.realpath(__file__)) 
 
@@ -174,8 +173,6 @@ class PostAlignmentTestCase(GenericTestCase):
         self.assertEqual(len(alignment_object), 7) # an alignment object has 7 fields
         self.assertEqual(alignment_object['level'], 1) # an alignment level is set by defaul to 1 (=Words)
         self.assertEqual(alignment_object['status'], 1) # an alignment status is set by defaul to 1 (=Not started)
-
-
 
 
 

@@ -8,6 +8,7 @@ import pytest
 from django.contrib.auth.models import User
 from django.urls.base import reverse
 from rest_framework import status
+
 from test.tests_server import PATH_TEST, GenericTestCase
 import os
 from Magixbackend.settings import MEDIA_ROOT
@@ -43,7 +44,7 @@ class UploadAudioTestCase(GenericTestCase):
 #         alignment = Alignment.objects.get(id=alignment_id) 
 #         self.assertEqual(alignment.status, 2) # check if on Queue. TODO: has to listen in a way for a save of object event. 
     
-        
+
     def test_api_upload_wrong_id(self):
 
         """Tests uploading audio to non-existing alignment_id."""
@@ -56,7 +57,6 @@ class UploadAudioTestCase(GenericTestCase):
 
         post_response = self.client.post(reverse('upload-audio'), data_upload) # upload audio
         self.assertEqual(post_response.status_code, status.HTTP_404_NOT_FOUND)
-
 
 
     def test_api_upload_not_complete_data(self):

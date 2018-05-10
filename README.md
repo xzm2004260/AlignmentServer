@@ -28,7 +28,7 @@ $ source bin/activate
 ```sh
 $ pip install -r requirements.txt
 ```
-- Setting up the Database
+- Setting up the postgres Database
 ```sh
 $ cd Magixbackend
 $ pwd //It should display like this "/Users/(user)/Magixbackend/Magixbackend"
@@ -48,8 +48,13 @@ $ sudo vim local_settings.py
 $ cd ..
 $ python manage.py migrate
 ```
-Create Superuser
+
+Steps to production
 ----------------
+- Uncomment authentication classes in model/alignment
+- 
+- Create super User
+
 ```sh
 $ python manage.py createsuperuser --username=mirza123 --email=mirza@gmail.com // unique username
 ```

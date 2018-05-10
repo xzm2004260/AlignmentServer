@@ -7,15 +7,14 @@ from rest_framework.test import APIClient
 from alignment.models import Alignment
 from composition.models import Composition
 from django.contrib.auth.models import User
-from Magixbackend.settings import MEDIA_ROOT
 
 PATH_TEST = os.path.dirname(os.path.realpath(__file__)) 
 
 
-class AlignmentTestCase(APITestCase):
+class GenericTestCase(APITestCase):
     """
     Test suite for the api views.
-
+    
     """
     @pytest.mark.django_db
     def setUp(self):
@@ -38,7 +37,8 @@ class AlignmentTestCase(APITestCase):
         token = response.data['token']
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
         
-        self.f = open(os.path.join(PATH_TEST, 'test_file.txt'), 'r')
+        self.f = open(os.path.join(PATH_TEST, 'data/umbrella_line.txt'), 'r')
+        
         self.alignment_data = {
             'title': 'new composition',
             'accompaniment': 2,
@@ -47,8 +47,20 @@ class AlignmentTestCase(APITestCase):
 
         self.pre_post_count_aligns = Alignment.objects.count()
         self.pre_post_count_compositions = Composition.objects.count()
+        
         self.post_response = self.client.post(reverse('create-alignment'), self.alignment_data, format='multipart') # create one alignment object
 
+
+
+
+class PostAlignmentTestCase(GenericTestCase):
+    """
+    Test suite for the api views.
+
+    """
+    @pytest.mark.django_db
+    def setUp(self):
+        GenericTestCase.setUp(self)
         self.alignment_data_by_comp_id = {
             'title': 'test title 2',
             'accompaniment': 2,
@@ -56,6 +68,7 @@ class AlignmentTestCase(APITestCase):
             'composition_id': -1
          }
 
+        
     def test_not_complete_data(self):
 
         """Tests missing required fields."""
@@ -163,25 +176,3 @@ class AlignmentTestCase(APITestCase):
 
 
 
-
-
-class Authentication(APITestCase):
-    """
-    Test suite for change password and and sign in.
-    """
-
-    @pytest.mark.django_db
-    def test_api_change_password_and_sign_in(self):
-        user = User.objects.create_user(username='mirza', email='mirza@gmail.com', password='old_pass')
-        user.is_active = False
-        user.save()
-        self.change_password_data = {
-            'username': 'mirza',
-            'password': 'new_pass'
-        }
-
-        response = self.client.post(reverse('password-change'), self.change_password_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response = self.client.post(reverse('signin'), self.change_password_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue('token' in response.data)

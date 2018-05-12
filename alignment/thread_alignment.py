@@ -29,7 +29,7 @@ class AlignThread (threading.Thread):
         alignment = Alignment.objects.get(id=self.alignment_id)
         alignment.status = Status.ONQUEUE # update status alignment
         alignment.save()
-        composition_id = alignment.composition.id.hex
+        composition_id = str(alignment.composition.id)
         
         #### set arguments 
         lyrics_URI = os.path.join(MEDIA_ROOT, 'lyrics/', composition_id )
@@ -42,9 +42,9 @@ class AlignThread (threading.Thread):
 
         with_section_anno=0
         vocal_intervals_URI=None
-#         detected_word_list =  align_CMU(self.recording_URI, lyrics_URI, output_URI, with_section_anno, vocal_intervals_URI ) #  align
-#         detected_word_list = detected_word_list[0] # one section only
-        time.sleep(3); detected_word_list = [ [[['word1',0,2]],[['word2',2,3]]] ]
+        detected_word_list =  align_CMU(self.recording_URI, lyrics_URI, output_URI, with_section_anno, vocal_intervals_URI ) #  align
+        detected_word_list = detected_word_list[0] # one section only
+#         time.sleep(3); detected_word_list = [ [[['word1',0,2]],[['word2',2,3]]] ]
                 
 #         with open(output_URI, 'r') as f1:
 #                 detectedTokenList = json.load( f1) 

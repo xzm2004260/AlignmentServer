@@ -28,8 +28,8 @@ def get_file(recording_url, alignment_id, output_dir):
     
     # TODO: get automatically file type
     ext = os.path.splitext(recording_url)[1]
-    if ext not in ['.mp3', '.wav', '.mp4', '.m4a','.ogg']: # all that are supported by ffmpeg
-        sys.exit('not acceptable extension') 
+    if ext not in ['.mp3', '.wav', '.mp4', '.m4a','.ogg']: # here  are some supported by ffmpeg
+        sys.exit('not acceptable extension')  # TODO: throw a http response with explanatory error
     source_file_uri = os.path.join(output_dir, alignment_id + ext)
     response = urlopen(recording_url)
     a = response.read()
@@ -37,7 +37,7 @@ def get_file(recording_url, alignment_id, output_dir):
         f.write(a)
     
     recording_URI = os.path.join(output_dir, alignment_id + '.wav')
-    pipe = subprocess.check_call(['/usr/local/bin/ffmpeg', '-y', '-i', source_file_uri, recording_URI])
+    pipe = subprocess.check_call(['/usr/local/bin/ffmpeg', '-y', '-i', source_file_uri, recording_URI]) # convert to wav
 #     pipe.wait()
     
     return recording_URI

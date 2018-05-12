@@ -7,7 +7,7 @@ import pytest
 from alignment.thread_alignment import AlignThread
 from alignment.models import Alignment
 import os
-from test.tests_server import GenericTestCase
+from test.test_post_alignment import GenericTestCase
 
 testDir = os.path.dirname(os.path.realpath(__file__))
 
@@ -31,7 +31,7 @@ class AlignmentResultTestCase(GenericTestCase):
         align_thread.join() # wait for alignment to finish
         
         alignment = Alignment.objects.get(id=alignment_id) 
-        self.assertEqual(alignment.status, 3) # check if status is done
+        self.assertEqual(alignment.status, 3) # check if status is DONE
         assert alignment.timestamps != 'null'
         
 if __name__ == '__main__':

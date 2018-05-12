@@ -1,0 +1,138 @@
+ Design of Classes 
+
+src.align.LyricsAligner
+----------------
+Top-level logic class
+
+methods:
+alignRecording - aligns whole recording, calls alignLyricsSection() for each recording sectionLink (e.g. segment)
+
+alignLyricsSection - method that does for each sectionLink 
+1) segregate vocal part from whole recording
+2) extract audio features for a section link
+3) decode the most probable alignment path
+
+
+src.align.Decoder
+---------------
+ fields:
+ lyricsWithModels - its field statesNetwork is used in self.constructHMMNetworkParameters() to construct a self.hmmNetwork in form usable for decoding
+ hmmNetwork - of type HMMDuration (HMM for forced alignment)
+ 
+ BACKTRACK_MARGIN_PERCENT - how much parcent makes sence to go back from last time frame in backtracking
+ set BACKTRACK_MARGIN_PERCENT to 0 to make backtracking only once from last state 
+ 
+ methods: 
+ 
+ _constructTransMatrixHMMNetwork() - contruct mega-transMatrix from simple trans matrices for states
+ 
+ duration2numFrameDuration(self, observationFeatures) - get relative tempo (numFramesPerMinUnit) for given audio chunk
+ 
+ decodeAudio() - a wrapper for hmm._BaseHMM._viterbiForced. 
+- assigns the exponential distribution to sil states at beginning and end
+- set nonvocal by setting self.hmmNetwork.setNonVocal(listNonVocalFragments): if listNonVocalFragments is empty then no predicted vocal fragments will be taken into account  
+ 
+ 
+ backtrack(self, withOracle, chiBackPointer, psiBackPointer):
+  backtrack optimal path of states from backpointers. Then interpretes the states sequence to words 
+  On construction of path backtracking is performed multiple times until starting at last time until full path is found       
+       calls hmm.Path.Path._backtrack() or hmm.Path.Path._backtrackForcedDur
+
+
+src.hmm.continuous._HMM (to reimplement)
+---------------------------------
+methods:
+
+viterbi_fast_forced(): does the actual forced alignment Viterbi
+
+constructTransMatrix(statesNetwork): iterate over states and put their wait probs in a matrix 
+
+initDecodingParameters(featureExtractor):
+        init observation probs map_B 
+        init pointer and total likelihood matrices    
+    
+
+src.hmm.Path.Path (to reimplement)
+---------------------
+methods:
+_backtrack() - constructs the path by backtracking
+
+
+  
+  
+
+src.align.Lyrics
+-------
+is a holder of a list of words: 
+fields: 
+-listWords
+-phonemesNetwork
+
+each object of class Word in turn contains a list of object type Syllable
+Each syllable in turn contains a list of Phoneme objects
+
+On init, graphemes are expanded to phonemes
+
+
+src.align._SyllableBase
+-----------
+fields:
+durationInMinUnit - assigned from score. could be given from source other than score. 
+Absolute duration is not important as it gets rescaled according to tempo in lyricsWithModels.duration2numFrameDuration()
+Important is the ratio  between relative syllable durations
+
+expandToPhonemes() - use grapheme2phoneme rules
+
+calcPhonemeDurs() - for each phoneme assign durations according to consonant handling policy. called in lyricsWithModels.duration2numFrameDuration() after 
+rescaling to tempo  
+
+
+
+src.align._LyricsWithModelsBase
+---------------------
+extend Lyrics with  modeling-related info : 
+- phonemes network (inherited). Adds links to trained models of class type htkModel from project HtkModelParser
+- statesNetwork : utility field for fast access to states when decoding; of class type StateWithDur inherited from htkModelParser
+
+fields: 
+withPaddedSilence - whether to add a 'sp' state at beginning and end (done in _phonemes2stateNetwork())
+
+
+self._phonemes2stateNetwork()
+ called in duration2numFrameDuration  
+     1) generate stateNetwork
+     2) assign phoneme a pointer to its initial state in the state network (serves as link among the two)
+     3) each state gets 1/n-th of total num of states
+     	
+
+DEBUG: 
+LyricsWithModels.LyricsWithModels.printWordsAndStatesAndDurations - can be used after decoding to compare ground truth with result 
+ - called from doitOneChunk.alignOneChunk()
+
+
+
+src.align._PhonemeBase
+------------------
+fields:
+-duration
+-htkModel
+
+
+src.align.LyricsParsing
+----------------------
+helper class:
+methods for parsing/looping in Lyrics.wordList and
+LyricsWithModels.statesNetwork
+
+
+
+
+
+
+
+src.align.Phonetizer
+-----------------
+grapheme2phoneme(word) - used to do the expansion of the graphemes (in a syllable) to phonemes 
+
+For all entities of lyrics the g2p rules are the same, so Phonetizer should be instantiated only once on highest level  
+  

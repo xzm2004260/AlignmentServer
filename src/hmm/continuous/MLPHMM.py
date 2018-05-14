@@ -239,7 +239,7 @@ def _file2nnet(layers, set_layer_num = -1, file_as_string='',  filename='', fact
         set_layer_num = n_layers
 
     if filename != '':
-        with smart_open(filename, 'rb') as fp:
+        with open(filename, 'r') as fp:
             nnet_dict = json.load(fp)
     else:
         nnet_dict = json.loads(file_as_string)

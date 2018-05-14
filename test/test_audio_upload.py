@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.urls.base import reverse
 from rest_framework import status
 
-from test.tests_server import PATH_TEST, GenericTestCase
+from test.test_post_alignment import PATH_TEST, GenericTestCase
 import os
 from Magixbackend.settings import MEDIA_ROOT
 from alignment.thread_alignment import AlignThread

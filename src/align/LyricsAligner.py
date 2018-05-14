@@ -221,11 +221,11 @@ class LyricsAligner():
         
         phi = decoder.hmmNetwork.phi
         phi_segments = decoder.path.calc_phi_segments_lines(phi, currSectionLink.lyricsWithModels) # phi score for path segments corresponding to lyrics lines
-        lyrics_lines = currSectionLink.lyricsWithModels.lyrics.lyrics_lines
-        if len(lyrics_lines) != len(phi_segments):
+        lyrics_lines_text = currSectionLink.lyricsWithModels.lyrics.get_lyrics_lines()
+        if len(lyrics_lines_text) != len(phi_segments):
             sys.exit('phi segments are {} while lyrics lines from text file are {} '\
-                 .format(len(phi_segments), len(lyrics_lines) ) )
-        lines_phis = list(zip(lyrics_lines, phi_segments))
+                 .format(len(phi_segments), len(lyrics_lines_text) ) )
+        lines_phis = list(zip(lyrics_lines_text, phi_segments))
         
         return detectedTokenList, lines_phis
 

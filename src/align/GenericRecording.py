@@ -16,7 +16,7 @@ import re
 
 from src.utilsLyrics.Utilz import loadTextFile
 from src.align.SectionLink import _SectionLinkBase
-from src.align.Lyrics import Lyrics
+from src.align.Lyrics import Lyrics, LyricsLine
 from src.for_english.CMUWord import CMUWord
 from .ParametersAlgo import ParametersAlgo 
 import mir_eval
@@ -110,7 +110,7 @@ class GenericRecording(_RecordingBase):
             end_times = self.derive_end_times_sections(start_times) 
             lyrics_arr = []
             for line in lines: # separate lyric object for each line
-                lyrics, token_Objects_list = line_to_lyrics(language, line)
+                lyrics, word_Objects_list = line_to_lyrics(language, line)
                 lyrics_arr.append(lyrics)
                 
         elif with_section_anno == 0: # the whole recording counts as the only section 
@@ -246,65 +246,45 @@ class GenericRecording(_RecordingBase):
             return vocal_intervals, non_vocal_intervals
 
 
-def line_to_tokens(line, token_Objects_list,  language):
+def line_to_tokens(line,  language):
     '''
     Parameters: 
     ----------------
-    token object list: [str]
-        list of lyrics tokens (usually words)
     
     line: str
-        tokens as a string
+        line from lyrics as a string
     language:
         if Mandarin, apply a bit different logic because Mandarin characters are split in a differernt way.
     
     Returns
     ---------------
-    token object list: [str]
-        same list with appended tokens from current line
+    word_object_list_line: [Word]
+         a list of word objects for each line
     
     '''
+    word_object_list_line = [] 
+    
     line = line.strip()
-    tokens = re.split(';|:|\*|-|\s', line)
-    for token in tokens: # each  token (word or syllable) is separated by whitespaces
+    words = re.split(';|:|\*|-|\s', line)
+    for word_text in words: # each  token (word or syllable) is separated by whitespaces
         if language == 'English':
-            token_Objects_list.append(CMUWord(text=token))
+            word_object_list_line.append(CMUWord(text=word_text))
         elif language == 'Mandarin':
-            token_Objects_list = lineTxt_to_syllableList(token, token_Objects_list)
-    word_silent = CMUWord(text='')
-    word_silent.set_last_in_sentence(True)
-    token_Objects_list.append(word_silent) # insert non-vocal token at the end of line
- 
-    return token_Objects_list
-
-def tokens_to_lyrics_object(token_list, language = 'English'):
-    '''
-    create a lyrics object consisting of syllables from lines of tokens
-    
-    Parameters
-    -----------
-    
-    tokens:
-        list of lyrics tokens
-    '''
-    
-
-    
-    #### expand to phonemes
+            word_object_list_line = lineTxt_to_syllableList(word_text, word_object_list_line)
     if language == 'English':
-        lyrics = Lyrics(token_list) 
-    elif language == 'Mandarin': 
-        lyrics = LyricsMandarin( token_list, 'dummy_banshi' )
-    
-    return lyrics
+        word_silent = CMUWord(text='')
+        word_silent.set_last_in_sentence(True)
+        word_object_list_line.append(word_silent) # insert non-vocal token at the end of line
+    return word_object_list_line
 
-def lineTxt_to_syllableList(lineTxt, token_Objects_list):
+
+def lineTxt_to_syllableList(lineTxt, word_Objects_list):
     '''
     parse Mandarin characters. convert to a list of syllable objects
     
     Parameters
     ---------------------
-    token_Objects_list: []
+    word_Objects_list: []
         list of to-this-point character objects
     lineTxt: str
         all characters of one text paragraph (line) together. characters have no white-space delimiters,
@@ -313,10 +293,10 @@ def lineTxt_to_syllableList(lineTxt, token_Objects_list):
     pinyin_syllables = pinyin.split()
     for pinyin_syllable in pinyin_syllables:
         if pinyin_syllable in non_pinyin: continue
-        token_Objects_list = createSyllable(token_Objects_list, pinyin_syllable) # extend the list of syllables with the new syllable
-    token_Objects_list = createSyllable(token_Objects_list, '') # add silence syllable at end of line
+        word_Objects_list = createSyllable(word_Objects_list, pinyin_syllable) # extend the list of syllables with the new syllable
+    word_Objects_list = createSyllable(word_Objects_list, '') # add silence syllable at end of line
     
-    return token_Objects_list
+    return word_Objects_list
 
 def mandarinToPinyin(mandarinChar):
 
@@ -372,25 +352,29 @@ def extract_non_vocal_in_interval(intervals, start_time, end_time):
 
 def line_to_lyrics(language, line):
     '''
-    helper
+    helper method
     '''
-    token_Objects_list = [CMUWord(text='')] # insert silence at beginning of line
-    token_Objects_list = line_to_tokens(line, token_Objects_list, language) # it inserts silence also at the end
-    lyrics = tokens_to_lyrics_object(token_Objects_list, language)
-    lyrics.set_lines([strip_line(line)])
-    return lyrics, token_Objects_list
+    line_word_list = line_to_tokens(line, language) # it inserts silence at the end
+    line_word_list.insert(0, CMUWord(text=''))  # insert silence at beginning of line
+#     lyrics = tokens_to_lyrics_object(token_list_line, language)
+#     lyrics.set_lyrics_lines([strip_line(line)])
+    lyrics_line = LyricsLine(line_word_list, strip_line(line))
+    
+    lyrics = Lyrics(list_lyrics_lines=[lyrics_line])
+    return lyrics, line_word_list
+
 
 def lines_to_lyrics( language, lines):
     '''
     helper for processing all lines from text file
     '''
-    token_Objects_list = []
-    lines_stripped = [] 
+    lyrics_lines_list = []
     for line in lines:
         if type(line) == int: continue # skip empty lines which we marked earlier by a flag -1
-        lines_stripped.append(strip_line(line))
-        token_Objects_list = line_to_tokens(line, token_Objects_list, language)
+        
+        line_word_list = line_to_tokens(line, language)
+        lyrics_line = LyricsLine(line_word_list, strip_line(line)) 
+        lyrics_lines_list.append(lyrics_line)
 
-    lyrics = tokens_to_lyrics_object(token_Objects_list, language)
-    lyrics.set_lines(lines_stripped)
+    lyrics = Lyrics(list_lyrics_lines=lyrics_lines_list)
     return lyrics

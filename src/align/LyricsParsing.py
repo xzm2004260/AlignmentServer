@@ -29,7 +29,7 @@ pathEvaluation = os.path.join(parentDir, 'AlignmentEvaluation')
 if pathEvaluation not in sys.path:
     sys.path.append(pathEvaluation)
     
-def expandlyrics2WordList (lyricsWithModels, path, func):
+def expand_path_to_wordList (lyricsWithModels, path, func):
     '''
     expand path to words and corresponding timestamps
     @param path stands for path or statesNetwork
@@ -49,6 +49,17 @@ def expandlyrics2WordList (lyricsWithModels, path, func):
 #         if currWord_and_ts[2] !=  '_SAZ_':
         wordList.append( currWord_and_ts)
     return wordList
+
+def token_list_to_line_ts( lyrics, detected_token_list):
+    '''
+    parse the list of word tokens. add a ts for each word at the beginning of a line
+    '''
+    idx_begin_line = 0
+    lines_begin_ts = []
+    for lyrics_line in lyrics.lyrics_lines:
+        lines_begin_ts.append(detected_token_list[idx_begin_line][0])
+        idx_begin_line += len(lyrics_line.listWords)
+    return lines_begin_ts  
 
 def get_state_idx_word(word_, states_network):
     '''
@@ -77,7 +88,7 @@ def get_idx_last_state_word(states_network, word_, lastSyll, lastPhoneme):
 
 
 
-def expandlyrics2SyllableList (lyricsWithModels, path, totalDuration, func):
+def expand_path_to_SyllableList (lyricsWithModels, path, totalDuration, func):
     '''
     expand @path to words and corresponding timestamps
     @param path stands for path or statesNetwork
@@ -111,7 +122,7 @@ def expandlyrics2SyllableList (lyricsWithModels, path, totalDuration, func):
             
     return wordList
 
-def expand_lyrics_to_phonemes_list(statesNetwork, path, func):
+def expand_path_to_phonemes_list(statesNetwork, path, func):
         
         detectedTokenList = []
         for i, idx_start in enumerate(path.indicesStateStarts):

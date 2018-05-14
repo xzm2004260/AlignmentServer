@@ -589,7 +589,9 @@ def addTimeShift( listTsAndTokens,   timeShift=0):
     '''
     
     for token in listTsAndTokens:
-        if ParametersAlgo.DETECTION_TOKEN_LEVEL == 'phonemes' or ParametersAlgo.DETECTION_TOKEN_LEVEL == 'words':
+        if ParametersAlgo.DETECTION_TOKEN_LEVEL == 'lines':
+            token += timeShift
+        elif ParametersAlgo.DETECTION_TOKEN_LEVEL in ['phonemes','words']:
             token[0] += timeShift # begin_ts
             token[1] += timeShift
         elif ParametersAlgo.DETECTION_TOKEN_LEVEL == 'syllables':

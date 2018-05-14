@@ -14,6 +14,7 @@ from alignment.models import Alignment, Status
 from src.align.doit import align_CMU
 import sys
 import time
+from src.align.ParametersAlgo import ParametersAlgo
 
  
 
@@ -40,10 +41,16 @@ class AlignThread (threading.Thread):
         
 #         if not os.path.exists(output_URI): # align
 
-        with_section_anno=0
+        with_section_anno=0 # works only with no annotation sections timestamps
         vocal_intervals_URI=None
+        if alignment.level == 1:
+            ParametersAlgo.DETECTION_TOKEN_LEVEL = 'words'
+        elif alignment.level == 2:
+            ParametersAlgo.DETECTION_TOKEN_LEVEL = 'lines'
+
         detected_word_list =  align_CMU(self.recording_URI, lyrics_URI, output_URI, with_section_anno, vocal_intervals_URI ) #  align
-        detected_word_list = detected_word_list[0] # one section only
+        if with_section_anno == 0:
+            detected_word_list = detected_word_list[0] # one section only
 #         time.sleep(3); detected_word_list = [ [[['word1',0,2]],[['word2',2,3]]] ]
                 
 #         with open(output_URI, 'r') as f1:

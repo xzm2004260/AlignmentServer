@@ -16,9 +16,10 @@ if projDir not in sys.path:
     sys.path.append(projDir)
 
 from src.align._SyllableBase import SIL_TEXT
-from src.align.LyricsParsing import expand_lyrics_to_phonemes_list
-from .LyricsParsing import expandlyrics2WordList, _constructTimeStampsForTokenDetected,\
-    expandlyrics2SyllableList
+from src.align.LyricsParsing import expand_path_to_phonemes_list,\
+    token_list_to_line_ts
+from .LyricsParsing import expand_path_to_wordList, _constructTimeStampsForTokenDetected,\
+    expand_path_to_SyllableList
 from .ParametersAlgo import ParametersAlgo
 if ParametersAlgo.VISUALIZE:
     from visualize import visualizeMatrix, visualizeBMap, visualizePath,\
@@ -250,14 +251,18 @@ class Decoder(object):
                 for i in range(howManyMissedStates):
                     self.path.indicesStateStarts[:0] = [0]
         
-        if tokenLevel == 'words':
+        if tokenLevel == 'lines':
+            detectedTokenList = expand_path_to_wordList (self.sectionLink.lyricsWithModels, self.path, _constructTimeStampsForTokenDetected)
+            detectedTokenList = token_list_to_line_ts(self.sectionLink.lyricsWithModels.lyrics, detectedTokenList) # get line timestamps
+
+        elif tokenLevel == 'words':
             if ParametersAlgo.FOR_JINGJU:
                 sys.exit('token leven cannot be words, there are no words in Mandarin')
-            detectedTokenList = expandlyrics2WordList (self.sectionLink.lyricsWithModels, self.path, _constructTimeStampsForTokenDetected)
+            detectedTokenList = expand_path_to_wordList (self.sectionLink.lyricsWithModels, self.path, _constructTimeStampsForTokenDetected)
         elif tokenLevel == 'syllables':
-            detectedTokenList = expandlyrics2SyllableList (self.sectionLink.lyricsWithModels, self.path, _constructTimeStampsForTokenDetected)
+            detectedTokenList = expand_path_to_SyllableList (self.sectionLink.lyricsWithModels, self.path, _constructTimeStampsForTokenDetected)
         elif tokenLevel == 'phonemes':
-            detectedTokenList = expand_lyrics_to_phonemes_list(self.sectionLink.lyricsWithModels.statesNetwork, self.path, _constructTimeStampsForTokenDetected)
+            detectedTokenList = expand_path_to_phonemes_list(self.sectionLink.lyricsWithModels.statesNetwork, self.path, _constructTimeStampsForTokenDetected)
         else:   
             detectedTokenList = []
             logger.warning( 'parsing of detected  {} not implemented'.format( tokenLevel) )

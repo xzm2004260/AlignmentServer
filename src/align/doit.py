@@ -43,7 +43,7 @@ def prompt_for_input():
         return input('lyrics contain a suspicious word. Are you sure this is part of the sung lyrics? [y/n] ')         
 
 
-def align_CMU(audioFileURI, lyrics_URI,  output_URI, with_section_annotations=0, vocal_intervals_URI=None):
+def align_CMU(audioFileURI, lyrics_URI,  output_URI, with_section_annotations=0, vocal_intervals_URI=None, is_test_case=False):
     '''
     top-level call method for English audio with CMU dictionary
     '''
@@ -54,7 +54,7 @@ def align_CMU(audioFileURI, lyrics_URI,  output_URI, with_section_annotations=0,
         #                     detectedTokenList, phiOptPath, detectedPath = read_decoded(URIRecordingChunkResynthesizedNoExt, detectedAlignedfileName)
     logging.info("working on recording {}".format(audioFileURI))
 
-    recording = create_recording(audioFileURI, lyrics_URI, with_section_annotations)
+    recording = create_recording(audioFileURI, lyrics_URI, with_section_annotations, is_test_case)
 #     print recording.sectionLinks[0].section.lyrics
 #     return
     recording.vocal_intervals_to_section_links(vocal_intervals_URI = vocal_intervals_URI) 

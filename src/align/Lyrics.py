@@ -5,6 +5,13 @@ Created on Oct 27, 2014
 '''
 import sys
 
+class LyricsLine(object):
+    
+    def __init__(self, listWords, raw_text):
+        self.listWords = listWords # this is redundant to Lyrics.listWords (the sum should be the same) but could be useful
+        self.raw_text = raw_text #  string of raw line as read from the txt file
+    
+
 class Lyrics(object):
     '''
     Lyrics data structures
@@ -14,11 +21,21 @@ class Lyrics(object):
     '''
 
 
-    def __init__(self, listWords):
+    def __init__(self, listWords=None, list_lyrics_lines=None):
+        
         '''
         Word[]
         '''
-        self.listWords = listWords
+        if listWords is not None:
+            self.listWords = listWords
+        elif list_lyrics_lines is not None:
+            self.lyrics_lines = list_lyrics_lines
+            self.listWords = []
+            for lyrics_line in list_lyrics_lines:
+                self.listWords.extend(lyrics_line.listWords)
+        else:
+            sys.exit('Error! Either listWords or list_lyrics_lines should be defined ') 
+                    
         '''
         Phoneme [] : list of phonemes
         '''
@@ -102,12 +119,19 @@ class Lyrics(object):
         for i, phoneme in enumerate(self.phonemesNetwork):
             print("{}: {} {}".format(i, phoneme.__str__(), phoneme.durationInMinUnit))
 #                         print "{}".format(phoneme.ID)
-    def set_lines(self, lyrics_lines):
+    def get_lyrics_lines(self):
         '''
-        lyric_lines are the raw lines as read from the txt file
+        lyric_lines are objects of type LyricLine that correspond to lines from lyrics. 
+        useful in case lyrics are organised as lines
         '''
-        self.lyrics_lines = lyrics_lines
-                 
+        if self.lyrics_lines is None:
+            sys.exit('lyrics lines not set')
+        
+        lyrics_lines_raw_text = []
+        for lyric_line in self.lyrics_lines:
+            lyrics_lines_raw_text.append(lyric_line.raw_text) 
+        return lyrics_lines_raw_text
+    
     def __str__(self):
         lyricsStr = ''
         for word_ in self.listWords:

@@ -11,7 +11,6 @@ from .serializer import (
 from .models import Alignment
 from services.utils import get_file
 from rest_framework import permissions
-from services.permissions import IsOwnerOrReadOnly
 from services.authentication import UserAuthentication
 import os
 from Magixbackend.settings import MEDIA_ROOT
@@ -27,8 +26,8 @@ class CreateAlignmentAPIView(APIView):
     """
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = AlignmentSerializer
-    # permission_classes = (permissions.IsAuthenticated,)
-    # authentication_classes = (UserAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (UserAuthentication,)
 
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -47,8 +46,8 @@ class AlignmentDetailAPIView(APIView):
        Get an existing alignment instance against some id.
 
     """
-    # permission_classes = (permissions.IsAuthenticated,)
-    # authentication_classes = (UserAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (UserAuthentication,)
 
     def get_object(self):
         try:
@@ -69,8 +68,8 @@ class UploadAPIView(APIView):
         Get a new audio instance.
 
     """
-    # permission_classes = (permissions.IsAuthenticated,)
-    # authentication_classes = (UserAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (UserAuthentication,)
 
     def post(self, request):
 

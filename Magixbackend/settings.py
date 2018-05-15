@@ -120,7 +120,7 @@ REST_FRAMEWORK = {
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
 
-# JWT_TOKEN_EXPIRY = 7
+JWT_TOKEN_EXPIRY = 10
 
 LANGUAGE_CODE = 'en-us'
 

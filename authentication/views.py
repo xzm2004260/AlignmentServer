@@ -47,7 +47,7 @@ class UserSignInAPIView(APIView):
     """
     This view is used to login with new password.
 
-        POST: auth/signin
+        POST: auth/token
 
         Params:
         {
@@ -68,6 +68,6 @@ class UserSignInAPIView(APIView):
             user.save()
             serializer = UserSignInSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response("Invalid Credentials or already logged in", status=status.HTTP_404_NOT_FOUND)
+        return Response("Invalid credentials or token already generated", status=status.HTTP_404_NOT_FOUND)
 
 

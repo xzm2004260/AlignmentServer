@@ -31,7 +31,7 @@ class GenericTestCase(APITestCase):
         # response = self.client.post(reverse('password-change'), change_password_data, format='json')
 
         # self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response = self.client.post(reverse('signin'), password_data, format='json')
+        response = self.client.post(reverse('token'), password_data, format='json')
         # self.assertEqual(response.status_code, status.HTTP_200_OK)
         # self.assertTrue('token' in response.data)
         token = response.data['token']

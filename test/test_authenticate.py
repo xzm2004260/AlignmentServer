@@ -27,7 +27,7 @@ class Authentication(APITestCase):
 
         response = self.client.post(reverse('password-change'), self.change_password_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response = self.client.post(reverse('signin'), self.change_password_data, format='json')
+        response = self.client.post(reverse('token'), self.change_password_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue('token' in response.data)
 

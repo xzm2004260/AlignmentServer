@@ -93,11 +93,13 @@ class GenericRecording(_RecordingBase):
         self.with_section_anno = with_section_anno
                 
         if not os.path.isfile(lyrics_URI):
-            sys.exit("no file {}".format(lyrics_URI))
+            msg = "no lyrics file {} found".format(lyrics_URI)
+            raise FileNotFoundError(msg)
         
         if with_section_anno == 1: # a section is a paragraph of lines
             start_times, section_lyrics = load_section_annotations(lyrics_URI)
-            end_times = self.derive_end_times_sections(start_times) 
+            end_times = self.derive_end_times_sections(start_times)
+
             lyrics_arr = []
             for lyrics_str in section_lyrics:
                 lines = lyrics_str.split('\n')
@@ -141,7 +143,9 @@ class GenericRecording(_RecordingBase):
         '''
         start_times = np.array(start_times)
         if start_times[-1] >= self.duration:
-            sys.exit(' timestamp of last line {} is bigger than recording duration {}'.format(start_times[-1], self.duration ))
+            
+            msg = ' timestamp of last line {} is bigger than recording duration {}'.format(start_times[-1], self.duration )
+            raise RuntimeError(msg)
         
         end_times = start_times[1:-1] + TOLERANCE_END_SECTION # give some overlapp as tolerance to last word in sentence
         last_start_time = start_times[-1] 

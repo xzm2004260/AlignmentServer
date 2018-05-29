@@ -98,54 +98,56 @@ class LyricsAligner():
 
 
     def alignRecording(self ):
-            '''
-            align each section link
-            
-            output_URI: str
-                output_URI for one section. So far only storing of results for each section separately supported. 
-                Since we support one section, output_URI is for one section. 
-            
-            Return
-            ----------------------- 
-            detected token list
-            '''
-            
-            decoders = [] # TODO: make decoder a field of current section link and feature extractor field of decoder
-                        
-            complete_recording_detected_token_list = []    
-            complete_recording_phi_segments  = []
-            
-            for  currSectionLink in self.recording.sectionLinks :
-                    if self.recording.duration < currSectionLink.endTs:
-                        sys.exit('section link ends over the end of the recording' )
+        '''
+        align each section link
+        
+        output_URI: str
+            output_URI for one section. So far only storing of results for each section separately supported. 
+            Since we support one section, output_URI is for one section. 
+        
+        Return
+        ----------------------- 
+        detected token list
+        '''
+        
+        decoders = [] # TODO: make decoder a field of current section link and feature extractor field of decoder
                     
-                    if not hasattr(currSectionLink, 'section') or currSectionLink.section == None:
-                        print(("skipping sectionAnno {} not matched to any score section ...".format(currSectionLink)))
-                        continue   
-                    lyrics = currSectionLink.section.lyrics
-         
-                    if len(lyrics.listWords) == 0:    
-                        print(("skipping sectionLink {} with no lyrics ...".format(currSectionLink.melodicStructure)))
-                        continue 
-                    decoder = self.prepare_decoder(    currSectionLink)
+        complete_recording_detected_token_list = []    
+        complete_recording_phi_segments  = []
+        
+        for  currSectionLink in self.recording.sectionLinks :
+                if self.recording.duration < currSectionLink.endTs:
+                    msg = 'Given section link ends at {} that is beyond the duration of the recording {}'.format(currSectionLink.endTs, self.recording.duration) 
+                    raise RuntimeError(msg)
+                    
+                if not hasattr(currSectionLink, 'section') or currSectionLink.section == None:
+                    print(("skipping sectionAnno {} not matched to any score section ...".format(currSectionLink)))
+                    continue   
+                lyrics = currSectionLink.section.lyrics
+     
+                if len(lyrics.listWords) == 0:    
+                    print(("skipping sectionLink {} with no lyrics ...".format(currSectionLink.melodicStructure)))
+                    continue 
+                decoder = self.prepare_decoder(    currSectionLink)
+                currSectionLink.detectedTokenList,  lines_max_phi_segments = self.align_lyrics_section(decoder, currSectionLink)
+                
+                if not is_detected_path_meaningful(lyrics, decoder.path) and len(currSectionLink.non_vocal_intervals) != 0: 
+                    logger.warning('Realigning recording segment from time {} to time {} without non-vocal segments'.format(currSectionLink.beginTs, currSectionLink.endTs) )
+                    currSectionLink.non_vocal_intervals = np.array([]); decoder = self.prepare_decoder(currSectionLink)
                     currSectionLink.detectedTokenList,  lines_max_phi_segments = self.align_lyrics_section(decoder, currSectionLink)
-                    
-                    if not is_detected_path_meaningful(lyrics, decoder.path) and len(currSectionLink.non_vocal_intervals) != 0: 
-                        logger.warning('Realigning recording segment from time {} to time {} without non-vocal segments'.format(currSectionLink.beginTs, currSectionLink.endTs) )
-                        currSectionLink.non_vocal_intervals = np.array([]); decoder = self.prepare_decoder(currSectionLink)
-                        currSectionLink.detectedTokenList,  lines_max_phi_segments = self.align_lyrics_section(decoder, currSectionLink)
-                        if not is_detected_path_meaningful(lyrics, decoder.path):
-                            sys.exit('Recording segment from time {} to time {} cannot be aligned.'.format(currSectionLink.beginTs, currSectionLink.endTs))    
-                    
-                    decoders.append(decoder)
-                    if len(complete_recording_detected_token_list) > 0 and self.recording.with_section_anno != 0: # do not check at first section/line
-                        complete_recording_detected_token_list = fix_non_meaningful_timestamps(complete_recording_detected_token_list, currSectionLink.detectedTokenList) # this is introduced for lines, it should not be needed for sections
-                    complete_recording_detected_token_list.extend(currSectionLink.detectedTokenList)
-                    complete_recording_phi_segments.extend(lines_max_phi_segments)
-
-            
+                    if not is_detected_path_meaningful(lyrics, decoder.path): # if problem still not solved
+                        msg = 'Recording segment from time {} to time {} cannot be aligned.'.format(currSectionLink.beginTs, currSectionLink.endTs)
+                        raise RuntimeError(msg)
                         
-            return complete_recording_detected_token_list, decoders, complete_recording_phi_segments # decoders is returned for access to decoding fields for control               
+                decoders.append(decoder)
+                if len(complete_recording_detected_token_list) > 0 and self.recording.with_section_anno != 0: # do not check at first section/line
+                    complete_recording_detected_token_list = fix_non_meaningful_timestamps(complete_recording_detected_token_list, currSectionLink.detectedTokenList) # this is introduced for lines, it should not be needed for sections
+                complete_recording_detected_token_list.extend(currSectionLink.detectedTokenList)
+                complete_recording_phi_segments.extend(lines_max_phi_segments)
+
+        
+                    
+        return complete_recording_detected_token_list, decoders, complete_recording_phi_segments # decoders is returned for access to decoding fields for control               
                
 
 
@@ -178,7 +180,8 @@ class LyricsAligner():
                  
  
                 if sampleRate != 44100:    # source separation is hard coded to work with 44100.
-                        sys.exit('sample rate is not 44100. source separation is hard coded to work with 44100')
+                    msg = 'sample rate is not 44100. source separation is hard coded to work with 44100'
+                    raise RuntimeError(msg)    
                 time0 = time.time()
                 audio = separate( audio, model_URI,0.3,30,25,32,513)
                 time1 = time.time()
@@ -223,8 +226,10 @@ class LyricsAligner():
         phi_segments = decoder.path.calc_phi_segments_lines(phi, currSectionLink.lyricsWithModels) # phi score for path segments corresponding to lyrics lines
         lyrics_lines_text = currSectionLink.lyricsWithModels.lyrics.get_lyrics_lines()
         if len(lyrics_lines_text) != len(phi_segments):
-            sys.exit('phi segments are {} while lyrics lines from text file are {} '\
-                 .format(len(phi_segments), len(lyrics_lines_text) ) )
+            msg = 'phi segments are {} while lyrics lines from text file are {} '\
+            .format(len(phi_segments), len(lyrics_lines_text) )
+            return msg, 'dummy_lyrics'
+        
         lines_phis = list(zip(lyrics_lines_text, phi_segments))
         
         return detectedTokenList, lines_phis
@@ -248,7 +253,8 @@ def fix_non_meaningful_timestamps(existing_token_list, incoming_token_list):
     incoming_token = incoming_token_list[0]
     
     if ParametersAlgo.DETECTION_TOKEN_LEVEL == 'phonemes':
-        sys.exit('section annotations not implemented with phonemes')
+        msg = 'section annotations not implemented with phonemes'
+        raise NotImplementedError(msg)
     if last_token_so_far[-1] == '' and incoming_token[-1] == '': # remove two repeated '.'-s
         del incoming_token_list[0]
     

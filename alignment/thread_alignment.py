@@ -36,7 +36,7 @@ class AlignThread (threading.Thread):
         lyrics_URI = os.path.join(MEDIA_ROOT, 'lyrics/', composition_id )
         output_URI = os.path.join(MEDIA_ROOT, 'alignments/', self.alignment_id + '.lab.txt' )
         
-        if not os.path.exists(self.recording_URI):
+        if not os.path.exists(self.recording_URI): # this should not happen
             sys.exit('file {} does not exist'.format(self.recording_URI) )
         
 #         if not os.path.exists(output_URI): # align
@@ -47,16 +47,21 @@ class AlignThread (threading.Thread):
             ParametersAlgo.DETECTION_TOKEN_LEVEL = 'words'
         elif alignment.level == 2:
             ParametersAlgo.DETECTION_TOKEN_LEVEL = 'lines'
-
-        detected_word_list =  align_CMU(self.recording_URI, lyrics_URI, output_URI, with_section_anno, vocal_intervals_URI ) #  align
-        if with_section_anno == 0:
-            detected_word_list = detected_word_list[0] # one section only
+        
+        try:
+            detected_word_list =  align_CMU(self.recording_URI, lyrics_URI, output_URI, with_section_anno, vocal_intervals_URI ) #  align
+            if with_section_anno == 0:
+                detected_word_list = detected_word_list[0] # one section only
+            alignment.timestamps = str(detected_word_list)
+            alignment.error_reason = None
+            alignment.status = Status.DONE # update status alignment
+        except (RuntimeError, FileNotFoundError, NotImplementedError) as error:
+            print(error)
+            alignment.status = Status.FAILED
+            alignment.error_reason = str(error)
+            alignment.timestamps = None
 #         time.sleep(3); detected_word_list = [ [[['word1',0,2]],[['word2',2,3]]] ]
                 
-#         with open(output_URI, 'r') as f1:
-#                 detectedTokenList = json.load( f1) 
-        alignment.timestamps = str(detected_word_list)
-        alignment.status = Status.DONE # update status alignment
         alignment.save()
         logging.info ("Finishing alignment for alignment id  " + str(self.alignment_id))
 

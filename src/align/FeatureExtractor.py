@@ -137,7 +137,7 @@ class FeatureExtractor(object):
         
         elif ParametersAlgo.OBS_MODEL == 'CNN': # mfcc type based on the model trained with these for mandarin
             if not os.path.isfile(filename):
-                sys.exit('OBS_MODEL CNN desired but no audio file exists' )
+                sys.exit('OBS_MODEL CNN desired but no audio file {} exists'.format(filename) )
             return processFeature(filename, feature_type='mfccBands2D')
 
         audio = essentia.array(audio) # make sure compatible with essentia

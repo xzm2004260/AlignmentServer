@@ -80,11 +80,11 @@ class PhonemeBase(object):
         
         try: self.model
         except AttributeError:
-                sys.exit("  phoneme {} has no models_makam assigned ".format(self.ID) )
+                sys.exit("  phoneme {} has no model assigned ".format(self.ID) )
         
         
         if not self.isModelType == 'htk':
-                    sys.exit("trans matrix defined only for htk models_makam" )
+                    sys.exit("trans matrix defined only for htk model" )
 
         vector_ = self.model.tmat.vector
         currTransMat = numpy.reshape(vector_ ,(len(vector_ )**0.5, len(vector_ )**0.5))

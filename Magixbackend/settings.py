@@ -80,13 +80,24 @@ WSGI_APPLICATION = 'Magixbackend.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
+# DATABASES = {
+#     'default': config(
+#         'DATABASE_URL',
+#         default='sqlite:///' + BASE_DIR.child('db.sqlite3'),
+#         cast=db_url,
+#     )
+# }
+
 DATABASES = {
-    'default': config(
-        'DATABASE_URL',
-        default='sqlite:///' + BASE_DIR.child('db.sqlite3'),
-        cast=db_url,
-    )
-}
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(os.path.dirname(__file__), BASE_DIR.child('db.sqlite3')), # no name means in-memory but in-memory does not support threads
+        'TEST_NAME': os.path.join(os.path.dirname(__file__), 'test.db'),
+        'OPTIONS': {'timeout': 30},
+    }
+  }
+
+
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
 

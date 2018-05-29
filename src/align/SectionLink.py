@@ -4,13 +4,11 @@ Created on Dec 28, 2015
 @author: joro
 '''
 import sys
-import tempfile
 import os
 import numpy as np
 
 from .ParametersAlgo import ParametersAlgo
 from src.align._LyricsWithModelsBase import _LyricsWithModelsBase
-audioTmpDir = tempfile.mkdtemp()
 
 class _SectionLinkBase():
 
@@ -19,10 +17,12 @@ class _SectionLinkBase():
         '''
         Constructor
         '''
-        basename = os.path.basename(URIWholeRecording_noExtension)
-        dirname_ = os.path.dirname(URIWholeRecording_noExtension)
+#         basename = os.path.basename(URIWholeRecording_noExtension)
+#         dirname_ = os.path.dirname(URIWholeRecording_noExtension)
+
+#         audioTmpDir = tempfile.mkdtemp()
 #         self.URIRecordingChunk = os.path.join(audioTmpDir, basename + "_" + "{}".format(beginTs) + '_' + "{}".format(endTs))
-        self.URIRecordingChunk = os.path.join(dirname_, basename + "_" + "{}".format(beginTs) + '_' + "{}".format(endTs))
+#         self.URIRecordingChunk = os.path.join(dirname_, basename + "_" + "{}".format(beginTs) + '_' + "{}".format(endTs))
         self.URIRecordingChunk = URIWholeRecording_noExtension
         
         self.beginTs = beginTs
@@ -94,47 +94,3 @@ class _SectionLinkBase():
         
         
 
-class SectionLinkMakam(_SectionLinkBase):
-    '''
-    as output of SectionLink  has match to only melodicStrcuture, so it is ambiguous and needs matching
-    '''
-    
-
-    def __init__(self, URIWholeRecording, melodicStructure, beginTs, endTs):
-        '''
-        Constructor
-        '''
-        _SectionLinkBase.__init__(self, URIWholeRecording, beginTs, endTs)
-        self.melodicStructure = melodicStructure
-  
-        
-        
-        
-        
-
-        
-
-
-          
-              
-        
-        
-class SectionAnnoMakam(SectionLinkMakam):
-    '''
-    sectionAnno has a link to exactSetion through tuple (melodicStructure, lyricsStucture)
-    SO it can be matched unambigously to a particular ScoreSection
-    '''
-    
-    def __init__(self, URIWholeRecording, melodicStructure, lyricStructure, beginTs, endTs):
-        SectionLinkMakam.__init__(self, URIWholeRecording, melodicStructure, beginTs, endTs)
-        self.lyricStructure = lyricStructure
-        
-    
-    def matchToSection(self,  scoreSections):
-        if self.lyricStructure == None:
-           sys.exit('cannot match link to section. No lyricStructure defined')
-        
-        for scoreSection in scoreSections:
-            if self.melodicStructure == scoreSection.melodicStructure and self.lyricStructure == scoreSection.lyricStructure:
-                self.setSection(scoreSection)
-                break  

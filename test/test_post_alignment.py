@@ -170,6 +170,6 @@ class PostAlignmentTestCase(GenericTestCase):
         
         self.assertEqual(response_from_get.status_code, status.HTTP_200_OK)
         alignment_object = response_from_get.json()
-        self.assertEqual(len(alignment_object), 7) # an alignment object has 7 fields
+        self.assertEqual(len(alignment_object), 8) # an alignment object has 8 fields
         self.assertEqual(alignment_object['level'], 1) # an alignment level is set by defaul to 1 (=Words)
         self.assertEqual(alignment_object['status'], 1) # an alignment status is set by defaul to 1 (=Not started)

@@ -8,11 +8,13 @@ class Status:
         NOTSTARTED = 1
         ONQUEUE = 2
         DONE = 3
+        FAILED = 4
 
         Choices = (
             (NOTSTARTED, 'NOTSTARTED'),
             (ONQUEUE, 'ONQUEUE'),
-            (DONE, 'DONE'),
+            (FAILED, 'DONE'),
+            (DONE, 'FAILED'),
         )
 
 class Alignment(models.Model):
@@ -36,7 +38,7 @@ class Alignment(models.Model):
         )
 
     
-
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     composition = models.ForeignKey(
         Composition,
         blank=True,
@@ -78,7 +80,8 @@ class Alignment(models.Model):
     #     null=True,
     #     blank=True
     # )
-
+    error_reason  = models.TextField(_('error_reason'), blank=True, null=True)
+    
     created_at = models.DateTimeField(
         _('created at'),
         auto_now_add=True,

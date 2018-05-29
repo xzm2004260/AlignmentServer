@@ -78,7 +78,8 @@ def get_idx_last_state_word(states_network, word_, lastSyll, lastPhoneme):
     '''
     if lastSyll.hasShortPauseAtEnd:
         if lastPhoneme.ID != SIL_TEXT:  # sanity check that last phoneme is sp
-            sys.exit(' \n last state for word {} is not sp. Sorry - not implemented.'.format(word_.text))
+            msg = ' \n last state for word {} is not sp. Sorry - not implemented.'.format(word_.text)
+            raise NotImplementedError(msg)
         countLastState = lastPhoneme.numFirstState # counter before sp 
     else:
         countLastState_ = lastPhoneme.numFirstState + lastPhoneme.getNumStates() - 1

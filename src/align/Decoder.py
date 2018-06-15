@@ -22,7 +22,7 @@ from .LyricsParsing import expand_path_to_wordList, _constructTimeStampsForToken
     expand_path_to_SyllableList
 from .ParametersAlgo import ParametersAlgo
 if ParametersAlgo.VISUALIZE:
-    from visualize import visualizeMatrix, visualizeBMap, visualizePath,\
+    from src.align.visualize import visualizeMatrix, visualizeBMap, visualizePath,\
     visualizeTransMatrix
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../test'))
@@ -153,8 +153,8 @@ class Decoder(object):
 
             chiBackPointer = None
 #            for kimseye region with note onsets for ISMIR poster SHi-KA-YET:
-            if ParametersAlgo.VISUALIZE:
-                self.hmmNetwork.visualize_trans_probs(self.sectionLink.lyricsWithModels, 685,1095, 13,19)
+#             if ParametersAlgo.VISUALIZE:
+#                 self.hmmNetwork.visualize_trans_probs(self.sectionLink.lyricsWithModels, 685,1095, 13,19)
         
         else:   # duration-HMM
             chiBackPointer, psiBackPointer = self.hmmNetwork._viterbiForcedDur()
@@ -167,7 +167,7 @@ class Decoder(object):
 
         if ParametersAlgo.VISUALIZE:
             ax = visualizeBMap(self.hmmNetwork.B_map)        
-#             visualizePath(ax,self.path.pathRaw, self.hmmNetwork.B_map)
+            visualizePath(ax,self.path.pathRaw, self.hmmNetwork.B_map)
 
 #             ax = visualizeMatrix(self.hmmNetwork.phi, 'phi' )
 #             ax = visualizeMatrix(self.hmmNetwork.psi, 'psi' )

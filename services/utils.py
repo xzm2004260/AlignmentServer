@@ -2,6 +2,7 @@ from urllib.request import urlopen
 import os
 import subprocess
 import sys
+import shutil
 
 
 def update_filename(instance, filename):
@@ -30,11 +31,15 @@ def get_file(recording_url, alignment_id, output_dir):
     ext = os.path.splitext(recording_url)[1]
     if ext not in ['.mp3', '.wav', '.mp4', '.m4a','.ogg']: # here  are some supported by ffmpeg
         sys.exit('not acceptable extension')  # TODO: throw a http response with explanatory error
-    source_file_uri = os.path.join(output_dir, alignment_id + ext)
-    response = urlopen(recording_url)
+    
+    response = urlopen(recording_url)    
     a = response.read()
+    
+    source_file_uri = os.path.join(output_dir, alignment_id + ext)
     with open(source_file_uri, 'wb') as f:
         f.write(a)
+
+#     shutil.copy(recording_url, source_file_uri)
     
     recording_URI = os.path.join(output_dir, alignment_id + '.wav')
     pipe = subprocess.check_call(['/usr/local/bin/ffmpeg', '-y', '-i', source_file_uri, recording_URI]) # convert to wav

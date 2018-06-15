@@ -21,6 +21,7 @@ testDir = os.path.dirname(os.path.realpath(__file__))
 test_recording_URL = os.path.join(testDir,'data/umbrella_line.wav')
 
 
+# TODO: another test with very short audio, so that we can check error_reason != None and timestamps == None
 class AlignmentResultTestCase(GenericTestCase):
 
     @pytest.mark.django_db
@@ -32,14 +33,16 @@ class AlignmentResultTestCase(GenericTestCase):
         
         alignment_id = self.post_response.json()['alignment_id']
         
-        with ThreadJoiner(2):
-            ### run alignment with given test audio
+        with ThreadJoiner(30):
+            ### run alignment with given test audio, skip uploading the audio by API method
             align_thread = AlignThread(alignment_id, test_recording_URL) 
             align_thread.start()
         
         alignment = Alignment.objects.get(id=alignment_id) 
-        self.assertEqual(alignment.status, 2) # check if status is DONE
-#         assert alignment.timestamps != None
+        self.assertEqual(alignment.status, 3) # check if status is DONE
+        assert alignment.timestamps != None
+        # TODO: assert timestamps  is array
+        assert alignment.error_reason == None
         
 if __name__ == '__main__':
     a = AlignmentResultTestCase()

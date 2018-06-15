@@ -131,9 +131,9 @@ def check_underscores(word):
     TODO: unfinished
     '''
     if word.contains('_'):
-        sys.exit('The word {} contains underscore(_). It is ambiguous if this connects two separate words or is a marker within one word. \
-        Please press enter to split word'.format(word))
-
+        msg = 'The word {} contains underscore(_). It is ambiguous if this connects two separate words or is a marker within one word. \
+        Please press enter to split word'.format(word)
+        raise RuntimeError(msg)
 
 
  
@@ -175,6 +175,19 @@ def replace_special_chars(ortho_word):
 #     ortho_word = ortho_word.replace('_',"'")
     ortho_word = ortho_word.replace("’","'")
     ortho_word = ortho_word.replace("^","i") # convention for dirty words in some rap songs
+    ortho_word = ortho_word.replace("á","a")
+    ortho_word = ortho_word.replace("à","a")
+    ortho_word = ortho_word.replace("ó","o")
+    ortho_word = ortho_word.replace("ò","o")
+    ortho_word = ortho_word.replace("ì","i")
+    ortho_word = ortho_word.replace("í","i")
+    ortho_word = ortho_word.replace("é","e")
+    ortho_word = ortho_word.replace("è","e")
+    ortho_word = ortho_word.replace("ú","u")
+    ortho_word = ortho_word.replace("ù","u")
+    ortho_word = ortho_word.replace("ñ","n")
+    ortho_word = ortho_word.replace("ç","c")
+    ortho_word = ortho_word.replace("å","a")
     for char in LIST_SUSP_CHARS:
         ortho_word = ortho_word.replace(char,"")
         
@@ -227,7 +240,8 @@ def number_to_words(number):
     try:
         num_in_words = inflect_engine.number_to_words(number)
     except:
-        sys.exit('The word {} contains digits, but is not a number'.format(number))
+        msg ='The word {} contains digits, but is not a number'.format(number)
+        raise RuntimeError(msg)
     num_in_words = num_in_words.replace('-',' ')
     return num_in_words
 

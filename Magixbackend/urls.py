@@ -14,9 +14,18 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import os
+settings_name = os.environ.get('DJANGO_SETTINGS_MODULE')
+if settings_name == 'Magixbackend.settings.test':
+    from Magixbackend.settings import test as settings
+elif settings_name == 'Magixbackend.settings.production':
+    from Magixbackend.settings import production as settings
+
 from django.contrib import admin
 from django.conf.urls import url, include
-from Magixbackend import settings
+
+    
+
 from django.conf.urls.static import static
 
 

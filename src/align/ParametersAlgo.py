@@ -42,7 +42,7 @@ class ParametersAlgo(object):
     # level into which to segments decoded result stateNetwork
 #     DETECTION_TOKEN_LEVEL= 'syllables'
     DETECTION_TOKEN_LEVEL = 'words'
-    DETECTION_TOKEN_LEVEL = 'lines'
+#     DETECTION_TOKEN_LEVEL = 'lines'
 #     DETECTION_TOKEN_LEVEL= 'phonemes'
     
     # unit: num frames, equiv to 1/hoplength
@@ -77,7 +77,7 @@ class ParametersAlgo(object):
     ANNOTATION_RULES_ONSETS_EXT = 'annotationOnsets.txt'
     ANNOTATION_SCORE_ONSETS_EXT = 'alignedNotes.txt' # use this ont to get better impression on recall, compared to annotationOnsets.txt, which are only on note onsets with rules of interest 
     
-    WRITE_TO_FILE = 0
+    WRITE_TO_FILE = 1
     
     
     

@@ -66,13 +66,15 @@ class Path(object):
         
     # final sanity check
         if self.pathRaw[0] != 0:
-            sys.exit(' backtracking NOT completed! stopped because reached totalAllowedDevTime. Exiting...  {}'.format(totalAllowedDevTime))
+            msg = ' backtracking NOT completed! stopped because reached totalAllowedDevTime. Exiting...  {}'.format(totalAllowedDevTime)
+            raise RuntimeError(msg)
 
             
     def setPathRaw(self, pathRaw):
         self.pathRaw = pathRaw
         if self.pathRaw[0] != 0:
-            sys.exit('loaded path does not start form first state. Exiting...')
+            msg = 'loaded path does not start form first state. Exiting...'
+            raise RuntimeError(msg)
         self.path2stateIndices()
     
     def _backtrack(self, psiBackPointer,  finalTime):
@@ -94,7 +96,8 @@ class Path(object):
             # backpointer
             pointer = psiBackPointer[t, currState]
             if pointer == -1:
-                sys.exit("at time {} the backpointer for state {} is not defined".format(t,currState))
+                msg = "at time {} the backpointer for state {} is not defined".format(t,currState)
+                raise RuntimeError(msg)
             currState = int(pointer)
             rawPath[t-1] = currState
             ### update 
@@ -177,7 +180,8 @@ class Path(object):
         ######### sanity check
         unique_states = set(self.pathRaw)
         if len(self.indicesStateStarts) != len(unique_states):
-            sys.exit('unique states  not same number as new states start')
+            msg = 'unique states  not same number as new states start'
+            raise RuntimeError(msg)
         
             
               

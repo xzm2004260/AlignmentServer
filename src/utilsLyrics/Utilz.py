@@ -11,7 +11,6 @@ import sys
 
 import difflib
 import glob
-import urllib.request, urllib.error, urllib.parse
 import csv
 import json
 import math
@@ -62,7 +61,8 @@ def findFileByExtensions(pathToComposition, listExtensions):
     
 #     listExtensions = ["sections.txt", "sections.tsv", "sections.json"]
     if not listExtensions:
-        sys.exit("{} is empty".format(listExtensions))
+        msg = "{} is empty".format(listExtensions)
+        raise RuntimeError(msg)
 
     os.chdir(pathToComposition)
 
@@ -120,11 +120,14 @@ def matchSections(s1, s2, indicesS2):
 
 def loadTextFile( pathToFile):
         '''
-        helper method to load all lines from a text file 
+        helper method to load all lines from a text file
+        @deprecated. replaced by  src.utilsLyrics.UtilsLyricsParsing.load_delimited 
         '''
         
         # U means cross-platform  end-line character
-        inputFileHandle = codecs.open(pathToFile, 'rU', 'utf-8', errors='ignore')
+#         inputFileHandle = codecs.open(pathToFile, 'rU', 'utf-8', errors='ignore')
+        inputFileHandle = codecs.open(pathToFile, 'rU', 'utf-8')
+
         
         allLines = inputFileHandle.readlines()
 
@@ -300,6 +303,9 @@ def write_decoded_to_file(detectedTokenList, detectedAlignedfileName,   phiOptPa
         '''
         writes path and list of aligned tokens to txt file 
         '''
+        
+        if type(detectedTokenList) == 'str': # it is an error message 
+            sys.exit(detectedTokenList)
         
         # write to json
 #         with open(detectedAlignedfileName + '.json', 'w') as f1:
@@ -609,6 +615,7 @@ def fetchFileFromURL(URL, outputFileURI):
 #         print "fetching file from URL {}...".format(URL)
         
         try:
+            import urllib.request
             response = urllib.request.urlopen(URL)
             a = response.read()
         except:
@@ -618,8 +625,9 @@ def fetchFileFromURL(URL, outputFileURI):
         
 def fetch_string_fromURL(URL):
 #         print "fetching file from URL {}...".format(URL)
-        
+            
         try:
+            import urllib.request
             response = urllib.request.urlopen(URL)
             a = response.read()
         except:
@@ -678,7 +686,8 @@ def tsToFrameNumber(ts):
     if ParametersAlgo.MFCC_HTK:
         return   max (0, int(math.floor( (ts - ParametersAlgo.WINDOW_LENGTH/2.0) * ParametersAlgo.NUMFRAMESPERSECOND)) )
     else:
-        sys.exit('tsToFrameNumber : if extracted mfcc features with s.th. different from htk, not implemented!')
+        msg = 'tsToFrameNumber : if extracted mfcc features with s.th. different from htk, not implemented!'
+        raise RuntimeError(msg)
  
  
 def frameNumberToTs(frameNum):

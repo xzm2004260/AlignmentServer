@@ -9,6 +9,11 @@ import numpy as np
 
 from .ParametersAlgo import ParametersAlgo
 from src.align._LyricsWithModelsBase import _LyricsWithModelsBase
+from src.align.FeatureExtractor import MODEL_PATH
+import logging
+import time
+from src.align.separate import separate
+import tempfile
 
 class _SectionLinkBase():
 
@@ -17,13 +22,16 @@ class _SectionLinkBase():
         '''
         Constructor
         '''
-#         basename = os.path.basename(URIWholeRecording_noExtension)
-#         dirname_ = os.path.dirname(URIWholeRecording_noExtension)
+        basename = os.path.basename(URIWholeRecording_noExtension)
 
-#         audioTmpDir = tempfile.mkdtemp()
-#         self.URIRecordingChunk = os.path.join(audioTmpDir, basename + "_" + "{}".format(beginTs) + '_' + "{}".format(endTs))
+        audioTmpDir = tempfile.mkdtemp()
+        self.URIRecordingChunk = os.path.join(audioTmpDir, basename + "_" + "{}".format(beginTs) + '_' + "{}".format(endTs))
+#         self.URIRecordingChunk = URIWholeRecording_noExtension
+
+# WITHOUT TEMP DIR: 
+#         dirname_ = os.path.dirname(URIWholeRecording_noExtension)
 #         self.URIRecordingChunk = os.path.join(dirname_, basename + "_" + "{}".format(beginTs) + '_' + "{}".format(endTs))
-        self.URIRecordingChunk = URIWholeRecording_noExtension
+
         
         self.beginTs = beginTs
         self.endTs = endTs
@@ -83,7 +91,40 @@ class _SectionLinkBase():
 
 #         self.lyricsWithModels.printPhonemeNetwork()
 
+    def get_audio_segment(self, audio, sample_rate):
+        '''
+        gets the audio_segment segment for this section fromt the audio_segment for the complete recording
+        '''
+        begin_sample = int(self.beginTs * sample_rate)
+        end_sample = int(self.endTs * sample_rate)
+        audio_segment = audio[begin_sample : end_sample]
+        return audio_segment
     
+    def separate_vocal(self, audio, sample_rate):
+        '''
+        Parameters
+        --------------------
+        audio: array [] 
+            the audio for the complete recording
+        sample_rate: int
+            read sampling rate
+        '''
+        # segregate vocal part from whole recording
+        model_URI = os.path.join(MODEL_PATH, 'krast.dad')
+
+
+
+        logging.info("doing source separation for recording: {} ...".format(self.URIRecordingChunk))
+        if sample_rate != 44100: # source separation is hard coded to work with 44100.
+            msg = 'sample rate is not 44100. source separation is hard coded to work with 44100'
+            raise RuntimeError(msg)
+        time0 = time.time()
+        
+        audio_sep = separate(audio, model_URI, 0.3, 30, 25, 32, 513)
+
+        time1 = time.time()
+        logging.info(" source separation: {} seconds".format(time1 - time0))
+        return audio_sep
     
     def loadSmallAudioFragmentOracle(self):
         raise NotImplementedError('loadSmallAudioFragmentOracle not implemeted')    

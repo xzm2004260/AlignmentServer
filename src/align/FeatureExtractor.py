@@ -88,15 +88,13 @@ class FeatureExtractor(object):
             .format(HIGH_FREQ_BOUND, 2* HIGH_FREQ_BOUND, sampleRate) )
         
         URI_recording_tmp = currSectionLink.URIRecordingChunk + '.wav'
-        begin_sample = int(currSectionLink.beginTs * sampleRate)
-        end_sample = int(currSectionLink.endTs * sampleRate)
-        audio = audio[begin_sample : end_sample] 
+         
         
         # call htk to extract features
         if ParametersAlgo.MFCC_HTK:
-#             scipy.io.wavfile.write(filename=URI_recording_tmp, rate=sampleRate, data=(audio).astype('int16')) # write back to file, because htk needs to read a file
+            scipy.io.wavfile.write(filename=URI_recording_tmp, rate=sampleRate, data=(audio).astype('int16')) # write back to file, because htk needs to read a file
             mfccsFeatrues = self._extractMFCCs_htk( URI_recording_tmp)
-#             os.remove(URI_recording_tmp)
+            os.remove(URI_recording_tmp)
             
         else: # with essentia 
             self.logger.info("extracting mfccs with C++ for recording: {} ...".format(URI_recording_tmp))
@@ -292,26 +290,7 @@ def stereo_to_MonoChunk(wavFileURI, begin_ts=0, end_ts=None, URIRecordingChunkRe
         monoWriter(chunk_of_audio)
         return output_wavFileURI
 
-def load_audio_mono(filein, with_normalization_max=0):
-    '''
-    load audio as float array using scipy. If stereo, average channels to mono
-    '''
-    sampleRate, audioObj = scipy.io.wavfile.read(filein)  
-    audioObj = audioObj.astype('float')
-    
-    if with_normalization_max:
-        try:
-            maxv = np.finfo(audioObj.dtype).max
-        except:
-            maxv = np.iinfo(audioObj.dtype).max
-    
-        audioObj /= maxv
-      
 
-    if (len(audioObj.shape))>1 and (audioObj.shape[1]>1): # stereo-to-mono. average the two channels
-            audioObj[:,0] = (audioObj[:,0] + audioObj[:,1]) / 2
-            audioObj = audioObj[:,0]  
-    return audioObj, sampleRate
     
 
 def delta(data, width=9, order=1, axis=-1, trim=True):

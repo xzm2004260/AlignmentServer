@@ -23,6 +23,7 @@ import mir_eval
 import logging
 from src.utilsLyrics.UtilsLyricsParsing import strip_line, load_section_annotations,\
     load_delimited
+import scipy.io.wavfile
 
 if ParametersAlgo.FOR_JINGJU:    
     from src.for_jingju.lyricsParser import createSyllable
@@ -41,40 +42,26 @@ class StructuralSection():
     def __init__(self, lyrics):
         self.lyrics = lyrics
         
-class _RecordingBase():
-
-    def __init__(self, mbRecordingID, audioFileURI, score):
-        '''
-        Constructor
-        '''
-        
-        self.mbRecordingID = mbRecordingID
-        
-        self.recordingNoExtURI = os.path.splitext(audioFileURI)[0]  
-        
-        self.duration = get_duration_audio(self.recordingNoExtURI + '.wav')
-
-        
-        path, fileName = os.path.split(audioFileURI)
-        path, self.which_fold = os.path.split(path) # which Fold
-        
-        self.score = score
-        
-        self.sectionLinks = []
-        
-    
-    
-    def _loadsectionTimeStampsLinks(self, sectionAnnosDict):
-        raise NotImplementedError('_loadsectionTimeStamps links not impl')
 
 
-
-class GenericRecording(_RecordingBase):
+class GenericRecording():
     '''
     input is lyrics as text file  
     '''
     def __init__(self, audioFileURI):
-        _RecordingBase.__init__(self, 'dummy_recid', audioFileURI, 'dummy_score')            
+
+        self.mbRecordingID = 'dummy_recid'
+        
+        self.recordingNoExtURI = os.path.splitext(audioFileURI)[0]  
+        self.sample_rate, self.audio = scipy.io.wavfile.read(self.recordingNoExtURI + '.wav') # load audio as float array using scipy.    
+        self.duration = get_duration_audio(self.recordingNoExtURI + '.wav')
+        
+        
+        path, fileName = os.path.split(audioFileURI)
+        path, self.which_fold = os.path.split(path) # which Fold
+        
+        
+        self.sectionLinks = []
         self.with_section_anno = None
 
 
@@ -170,6 +157,12 @@ class GenericRecording(_RecordingBase):
             
             sectionLink.section.lyrics.printWords()
 #             sectionLink.section.lyrics.printPhonemeNetwork()
+    
+        
+
+        
+ 
+
         
     def _loadsectionTimeStampsLinks(self, sectionAnnosDict):  
         '''
@@ -195,6 +188,7 @@ class GenericRecording(_RecordingBase):
         section_link = _SectionLinkBase(self.recordingNoExtURI, float(tokens[0]), float(tokens[1]))
         self.sectionLinks.append(section_link)
     
+   
     
 
     def vocal_intervals_to_section_links(self, vocal_intervals_URI):
@@ -248,6 +242,8 @@ class GenericRecording(_RecordingBase):
                     non_vocal_intervals = all_intervals[::2,:]
             
             return vocal_intervals, non_vocal_intervals
+
+
 
 
 def line_to_tokens(line,  language):

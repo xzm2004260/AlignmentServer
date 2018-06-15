@@ -4,10 +4,12 @@ import scipy
 from scipy.signal import blackmanharris as blackmanharris
 from scipy import io
 from scipy.io import wavfile
-try:
-    import pickle as pickle
-except:
-    import pickle
+
+# try:
+#     import cPickle as pickle
+# except:
+import pickle
+
 import theano
 import theano.tensor as T
 import theano.sandbox.rng_mrg
@@ -15,8 +17,10 @@ import lasagne
 
 
 def load_model(filename):
-    f=file(filename,'rb')
-    params=pickle.load(f)
+    f=open(filename,'rb')
+    u = pickle._Unpickler(f)
+    u.encoding = 'latin1'
+    params=u.load()
     f.close()
     return params
 
@@ -235,12 +239,14 @@ def build_ca(input_var=None, batch_size=32,time_context=30,feat_size=513):
    
     return l_out
 
-
 def separate(audioObj, model,scale_factor=0.3,time_context = 30,overlap = 20,batch_size=32,input_size=513):
-    
+    '''
+    source separation, HARD-coded with sample rate of 44100
+    '''
     input_var2 = T.tensor4('inputs')
     target_var2 = T.tensor4('targets')
     rand_num = T.tensor4('rand_num')
+    source = ['vocals','bass','drums','other']
 
     eps=1e-18
     network2 = build_ca(input_var2,batch_size,time_context,input_size)    
@@ -248,9 +254,8 @@ def separate(audioObj, model,scale_factor=0.3,time_context = 30,overlap = 20,bat
 #####   "Loading source separation model..."
     params=load_model(model)
     lasagne.layers.set_all_param_values(network2,params)
-    
-######  preparing parameters 
 
+######  preparing parameters 
     prediction2 = lasagne.layers.get_output(network2, deterministic=True)
     rand_num = np.random.uniform(size=(batch_size,1,time_context,input_size))
     network2=None
@@ -273,32 +278,45 @@ def separate(audioObj, model,scale_factor=0.3,time_context = 30,overlap = 20,bat
     others=mask4*input_var2  
 
     predict_function2=theano.function([input_var2],[vocals,bass,drums,others],allow_input_downcast=True) 
- 
-######  generate overlapp-add
+    
+    ########## normalize to max = 1, needed for  separation
+    try:
+        maxv = np.finfo(audioObj.dtype).max
+    except:
+        maxv = np.iinfo(audioObj.dtype).max
+
+    audioObj = audioObj.astype('float') / maxv
+      
+    ### if stereo average channels to mono, needed for separation
+    if (len(audioObj.shape))>1 and (audioObj.shape[1]>1):
+        audioObj[:,0] = (audioObj[:,0] + audioObj[:,1]) / 2
+        audioObj = audioObj[:,0]
+    
     mag,ph=compute_file(audioObj,phase=True)     
     mag=scale_factor*mag.astype(np.float32)
-
+    
+    ############### overlap-add
     batches,nchunks = generate_overlapadd(mag,input_size=mag.shape[-1],time_context=time_context,overlap=overlap,batch_size=batch_size,sampleRate=44100)
     output=[]
     
     batch_no=1
     for batch in batches:
-         batch_no+=1           
-         output.append(predict_function2(batch))
+        batch_no+=1           
+        output.append(predict_function2(batch))
     
     output=np.array(output)
     mm = overlapadd_multi(output,batches,nchunks,overlap=overlap)
     
-   #######       actual separation 
-    audio_out=compute_inverse(mm[0,:len(ph)]/scale_factor,ph)
+    
+    audio_out=compute_inverse(mm[0,:len(ph)]/scale_factor,ph) # actual separation
      
     if len(audio_out)>len(audioObj):
          audio_out=audio_out[:len(audioObj)]
-    maxn = np.iinfo(np.int16).max  
-     
+                
+    maxn = np.iinfo(np.int16).max
     return audio_out*maxn
-    
-#         scipy.io.wavfile.write(filename=output_URI, rate=sampleRate, data=(audio_out*maxn).astype('int16'))
+
+
         
 
 def main(argv):  

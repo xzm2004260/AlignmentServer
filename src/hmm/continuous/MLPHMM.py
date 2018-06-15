@@ -163,7 +163,8 @@ class MLPHMM(_HMM):
 
         # double check that features are in same dimension as models
         if features.shape[1] != self.model.n_ins:
-                sys.exit("dimension of feature vector should be {} but is {} ".format(self.model.n_ins, features.shape[1]) )
+                msg = "dimension of feature vector should be {} but is {} ".format(self.model.n_ins, features.shape[1]) 
+                raise RuntimeError(msg)
         
         ################ recognize
         layer_index  = -1 # last tier

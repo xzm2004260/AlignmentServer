@@ -30,7 +30,6 @@ def load_section_annotations(lyrics_URI):
     should_start_section = 1
     for start_time, end_time, line in zip( start_times, end_times, lines):
         
-        
         if line != -1: #next line
             if should_start_section:
                 section_lyrics = []
@@ -109,7 +108,10 @@ def load_delimited(filename, converters, delimiter=r'\s+'):
     #   2. numpy's text loader does not handle non-numeric data
     #
 #     with _open(filename, mode='r') as input_file:
-    with codecs.open(filename, 'rU', encoding='utf8', errors='ignore') as input_file:
+#     with codecs.open(filename, 'rU', encoding='utf8', errors='ignore') as input_file:
+#     with codecs.open(filename, 'rU', encoding='utf8') as input_file:
+    with codecs.open(filename, 'rU', encoding='latin-1') as input_file:
+
         for row, line in enumerate(input_file, 1):
             stripped_line = strip_line(line)
             # Split each line using the supplied delimiter

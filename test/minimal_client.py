@@ -10,7 +10,7 @@ f = open(os.path.join(PATH_TEST, 'data/umbrella_line.txt'), 'rb')
 alignment_data = MultipartEncoder(
     fields={
             # a file upload field
-            'lyrics': ('test_file.txt', f, 'text/plain'),
+            'lyrics': ('test_long_lyrics.txt', f, 'text/plain'),
             # plain text fields
             'title': 'new composition', 
             'accompaniment': '2',

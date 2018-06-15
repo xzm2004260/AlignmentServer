@@ -27,7 +27,8 @@ def create_recording(audioFileURI, lyrics_URI, with_section_annotations=0, is_te
     '''
     helper method for a couple of lines that create recording object and its lyrics
     '''
-    fn_dict = os.path.join(projDir, 'src/for_english/cmudict.0.6d.syll')
+    srcDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__) ), os.path.pardir) )
+    fn_dict = srcDir +  '/for_english/cmudict.0.6d.syll' # join did not work for some reason
     Phonetizer.initPhoneticDict(ParametersAlgo.POLYPHONIC, fn_dict)
     
     recording = GenericRecording(audioFileURI)
@@ -64,12 +65,11 @@ def align_CMU(audioFileURI, lyrics_URI,  output_URI, with_section_annotations=0,
     detectedTokenList, _, recording_phi_segments  = la.alignRecording() # align
     
 #          detectedAlignedfileName = currSectionLink.URIRecordingChunk + tokenLevelAlignedSuffix
-    max_phi_score = average_phi_segments(recording_phi_segments)
     ###### write all decoded output persistently to files
     if ParametersAlgo.WRITE_TO_FILE:
-            write_decoded_to_file(detectedTokenList, output_URI, max_phi_score, recording_phi_segments)                
+        max_phi_score = average_phi_segments(recording_phi_segments)
+        write_decoded_to_file(detectedTokenList, output_URI, max_phi_score, recording_phi_segments)                
      
-    
     #init results
     sectionswise_detected_token_list = []
     
@@ -99,7 +99,7 @@ def doit_CMU(argv):
     # test with section links. polyphonic
 
 #     # test of audio working 
-    ParametersAlgo.POLYPHONIC = 0
+    ParametersAlgo.POLYPHONIC = 1
     ParametersAlgo.WITH_ORACLE_ONSETS = -1
     ParametersAlgo.WITH_ORACLE_PHONEMES = 0
     # set WITH_DURATIONS in ParametersAlgo. it cannot be set here
@@ -117,9 +117,12 @@ def doit_CMU(argv):
     else:
         vocal_intervals_URI = None
         output_URI = argv[4]
-        
-    ret = align_CMU(audioFileURI, lyrics_URI, output_URI, with_section_anno, vocal_intervals_URI )
-
+    try:    
+        ret = align_CMU(audioFileURI, lyrics_URI, output_URI, with_section_anno, vocal_intervals_URI )
+        print(ret)
+    except (RuntimeError,FileNotFoundError) as error:
+        logging.error(error)
+    
 if __name__ == '__main__':
     doit_CMU(sys.argv)
        

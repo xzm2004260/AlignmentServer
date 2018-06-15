@@ -10,6 +10,7 @@ import os
 import sys
 import time
 import numpy as np
+import scipy.io.wavfile
 
 
 ### include src folder
@@ -19,11 +20,10 @@ if parentDir not in sys.path:
 
 from src.hmm.continuous.MLPHMM import load_MLPs_and_config
 from src.align._SyllableBase import SIL_TEXT
-from src.align.FeatureExtractor import FeatureExtractor, MODEL_PATH, load_audio_mono
+from src.align.FeatureExtractor import FeatureExtractor
 from src.align.ParametersAlgo import ParametersAlgo
-if ParametersAlgo.POLYPHONIC:
-    from src.align.separate import separate
- 
+
+
 # from src.onsets.OnsetDetector import OnsetDetector
 
 from .Decoder import Decoder
@@ -128,19 +128,20 @@ class LyricsAligner():
                 if len(lyrics.listWords) == 0:    
                     print(("skipping sectionLink {} with no lyrics ...".format(currSectionLink.melodicStructure)))
                     continue 
-                decoder = self.prepare_decoder(    currSectionLink)
+                decoder, feature_extractor = self.prepare_decoder(    currSectionLink)
+                decoder.caclulate_Bmap(feature_extractor)
                 currSectionLink.detectedTokenList,  lines_max_phi_segments = self.align_lyrics_section(decoder, currSectionLink)
                 
                 if not is_detected_path_meaningful(lyrics, decoder.path) and len(currSectionLink.non_vocal_intervals) != 0: 
                     logger.warning('Realigning recording segment from time {} to time {} without non-vocal segments'.format(currSectionLink.beginTs, currSectionLink.endTs) )
-                    currSectionLink.non_vocal_intervals = np.array([]); decoder = self.prepare_decoder(currSectionLink)
+                    currSectionLink.non_vocal_intervals = np.array([]); decoder.caclulate_Bmap(feature_extractor)
                     currSectionLink.detectedTokenList,  lines_max_phi_segments = self.align_lyrics_section(decoder, currSectionLink)
                     if not is_detected_path_meaningful(lyrics, decoder.path): # if problem still not solved
                         msg = 'Recording segment from time {} to time {} cannot be aligned.'.format(currSectionLink.beginTs, currSectionLink.endTs)
                         raise RuntimeError(msg)
                         
                 decoders.append(decoder)
-                if len(complete_recording_detected_token_list) > 0 and self.recording.with_section_anno != 0: # do not check at first section/line
+                if len(complete_recording_detected_token_list) > 0 and self.recording.with_section_anno == 2: # do not check at first section/line
                     complete_recording_detected_token_list = fix_non_meaningful_timestamps(complete_recording_detected_token_list, currSectionLink.detectedTokenList) # this is introduced for lines, it should not be needed for sections
                 complete_recording_detected_token_list.extend(currSectionLink.detectedTokenList)
                 complete_recording_phi_segments.extend(lines_max_phi_segments)
@@ -149,69 +150,42 @@ class LyricsAligner():
                     
         return complete_recording_detected_token_list, decoders, complete_recording_phi_segments # decoders is returned for access to decoding fields for control               
                
-
+   
 
     def  prepare_decoder( self,    currSectionLink):
             '''
-            load decoder object for current section link
+            1) load audio as array 
+            2) extract features 
+            3) create decoder object for current section link.
             '''
                 
-            from datetime import date
-            a = False
-                
-            fe = FeatureExtractor(self.path_to_hcopy, currSectionLink) 
-            
-            if self.dateEnd.date() < date.today():
-                a = True
-            
-            onsetDetector  = None
-            
-#             if a:
+#             from datetime import date
+#             if self.dateEnd.date() < date.today():
 #                 sys.exit('The licensed trial version has expired. Please contact info@voicemagix.com')
             
-            # normalization needed for source sep
-            audio, sampleRate = load_audio_mono(self.recording.recordingNoExtURI + '.wav', with_normalization_max=ParametersAlgo.POLYPHONIC) 
- 
-             
-            # segregate vocal part from whole recording
-            if ParametersAlgo.POLYPHONIC: 
-                model_URI = os.path.join(MODEL_PATH,   'krast.dad')
-                logger.info("doing source separation for recording: {} ...".format(self.recording.recordingNoExtURI) )
-                 
- 
-                if sampleRate != 44100:    # source separation is hard coded to work with 44100.
-                    msg = 'sample rate is not 44100. source separation is hard coded to work with 44100'
-                    raise RuntimeError(msg)    
-                time0 = time.time()
-                audio = separate( audio, model_URI,0.3,30,25,32,513)
-                time1 = time.time()
-                logger.info(" source separation: {} seconds".format(time1-time0) )
- 
-            
+            audio_segment = currSectionLink.get_audio_segment(self.recording.audio, self.recording.sample_rate)
+
+            if ParametersAlgo.POLYPHONIC:
+                audio_segment = currSectionLink.separate_vocal(audio_segment, self.recording.sample_rate)
             else:
-                logger.info(" A cappella desired. Skipping source separation for recording: {} ...".format(self.recording.recordingNoExtURI) )
- 
-            #  extract audio features for a section link
-                             
+                logging.info(" A cappella desired. Skipping source separation for recording: {} ...".format(currSectionLink))
+
+            
             time0 = time.time()
-            fe.featureVectors = fe.loadMFCCs(audio, currSectionLink,  sampleRate) #     featureVectors = featureVectors[0:1000]
+            fe = FeatureExtractor(self.path_to_hcopy, currSectionLink) 
+            fe.featureVectors = fe.loadMFCCs(audio_segment, currSectionLink,  self.recording.sample_rate) #     featureVectors = featureVectors[0:1000]
             time1 = time.time()
             logger.debug(" mfcc extraction: {} seconds".format(time1-time0) )
  
-            currSectionLink.createLyricsModels( fe.featureVectors)
+            currSectionLink.createLyricsModels()
              
-#                 if logger.level == logging.DEBUG:
-#                     currSectionLink.lyricsWithModels.printWordsAndStates()
-#                         currSectionLink.lyricsWithModels.lyrics.printPhonemeNetwork()
-        #################### decode
+            #################### decode
             time0 = time.time()
             decoder = Decoder(currSectionLink, self.acoustic_model, self.cfg_acoustic_model)
             time1 = time.time()
             logger.debug(" hmm network creation (incl. trans matrix): {} seconds".format(time1-time0) )
             
-            decoder.caclulate_Bmap(fe, onsetDetector) 
-            
-            return decoder
+            return decoder, fe
       
         
     def align_lyrics_section(self, decoder, currSectionLink):

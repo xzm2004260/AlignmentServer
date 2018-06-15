@@ -7,13 +7,24 @@ Created on 03/05/2018
 import threading
 import logging
 import os
-
-# from src.align.doit import align_CMU
-from Magixbackend.settings import MEDIA_ROOT
-from alignment.models import Alignment, Status
-from src.align.doit import align_CMU
 import sys
 import time
+
+
+settings_name = os.environ.get('DJANGO_SETTINGS_MODULE')
+if settings_name == 'Magixbackend.settings.test':
+    from Magixbackend.settings.test import MEDIA_ROOT
+elif settings_name == 'Magixbackend.settings.production':
+    from Magixbackend.settings.production import MEDIA_ROOT
+
+from alignment.models import Alignment, Status
+parentDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__) ), os.path.pardir,os.path.pardir ))
+Alignment_dir = os.path.join(parentDir, 'AlignmentMagix')
+if Alignment_dir not in sys.path:
+    sys.path.append(Alignment_dir)
+
+
+from src.align.doit import align_CMU
 from src.align.ParametersAlgo import ParametersAlgo
 
  
@@ -43,10 +54,16 @@ class AlignThread (threading.Thread):
 
         with_section_anno=0 # works only with no annotation sections timestamps
         vocal_intervals_URI=None
-        if alignment.level == 1:
+        if alignment.level == 1: ### set level
             ParametersAlgo.DETECTION_TOKEN_LEVEL = 'words'
         elif alignment.level == 2:
             ParametersAlgo.DETECTION_TOKEN_LEVEL = 'lines'
+        
+        if alignment.accompaniment == 1: ### set accompaniment
+            ParametersAlgo.POLYPHONIC = 0
+        elif alignment.accompaniment == 2:
+            ParametersAlgo.POLYPHONIC = 1
+        
         
         try:
             detected_word_list =  align_CMU(self.recording_URI, lyrics_URI, output_URI, with_section_anno, vocal_intervals_URI ) #  align

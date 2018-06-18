@@ -48,8 +48,7 @@ def align_CMU(audioFileURI, lyrics_URI,  output_URI, with_section_annotations=0,
     '''
     top-level call method for English audio with CMU dictionary
     '''
-    if os.path.isfile(output_URI) and \
-    (ParametersAlgo.LOGGING_LEVEL == logging.DEBUG or ParametersAlgo.LOGGING_LEVEL == logging.INFO) : # at production does not stops
+    if os.path.isfile(output_URI) and ParametersAlgo.SKIP_ALREADY_ALIGNED:   # at production does not stops
         logging.info('recording already aligned in file {}'.format(output_URI))
         return
         #                     detectedTokenList, phiOptPath, detectedPath = read_decoded(URIRecordingChunkResynthesizedNoExt, detectedAlignedfileName)

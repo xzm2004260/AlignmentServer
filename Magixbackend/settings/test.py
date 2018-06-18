@@ -9,16 +9,6 @@ WSGI_APPLICATION = 'Magixbackend.test_wsgi.application'
 
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(os.path.dirname(__file__), BASE_DIR.child('db.sqlite3')), # no name means in-memory but in-memory does not support threads
-        'TEST_NAME': os.path.join(os.path.dirname(__file__), 'test.db'),
-        'OPTIONS': {'timeout': 30},
-    }
-  }
-
-
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',

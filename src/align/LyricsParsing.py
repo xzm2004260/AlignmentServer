@@ -44,7 +44,7 @@ def expand_path_to_wordList (lyricsWithModels, path, func):
 
         startNoteNumber = word_.syllables[0].noteNum
         
-        currWord_and_ts, totalDuration = func( word_.text, countFirstState, countLastState, path, 'dummy')
+        currWord_and_ts, totalDuration = func( word_.text, countFirstState, countLastState, path, False)
         
 #         if currWord_and_ts[2] !=  '_SAZ_':
         wordList.append( currWord_and_ts)
@@ -156,8 +156,10 @@ def _constructTimeStampsForTokenDetected(  text, countFirstState, countLastState
         currTokenBeginFrame, currTokenEndFrame = getBoundaryFrames(countFirstState, countLastState, path)    
         
         startTs = frameNumberToTs(currTokenBeginFrame)
+        startTs = float('{0:.2f}'.format(startTs))
         if use_end_ts:
             endTs = frameNumberToTs(currTokenEndFrame)
+            endTs = float('{0:.2f}'.format(endTs))
             detected_token = [startTs, endTs, text]
         else:
             detected_token = [startTs, text]

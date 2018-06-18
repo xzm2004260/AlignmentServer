@@ -18,6 +18,12 @@ Installation
 ------------
 Following are the steps to install this platform.
 
+- Set the env var DJANGO_SETTINGS_MODULE
+DJANGO_SETTINGS_MODULE=Magixbackend.setting.test
+or 
+DJANGO_SETTINGS_MODULE=Magixbackend.setting.production. 
+Default is test, being set in manage.py
+
 - Create Virtual Environment
 ```sh
 $ virtualenv magixbackend-venv --python=python3

@@ -33,7 +33,7 @@ class AlignmentResultTestCase(GenericTestCase):
         
         alignment_id = self.post_response.json()['alignment_id']
         
-        with ThreadJoiner(30):
+        with ThreadJoiner(100):
             ### run alignment with given test audio, skip uploading the audio by API method
             align_thread = AlignThread(alignment_id, test_recording_URL) 
             align_thread.start()

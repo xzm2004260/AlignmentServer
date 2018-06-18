@@ -16,6 +16,7 @@ import logging
 ######### PARAMS:
 class ParametersAlgo(object):
     
+    SKIP_ALREADY_ALIGNED = 0
     LOGGING_LEVEL = logging.WARNING # used in production to skip info and debug messages
 #     LOGGING_LEVEL = logging.INFO
     LOGGING_LEVEL = logging.DEBUG
@@ -77,7 +78,7 @@ class ParametersAlgo(object):
     ANNOTATION_RULES_ONSETS_EXT = 'annotationOnsets.txt'
     ANNOTATION_SCORE_ONSETS_EXT = 'alignedNotes.txt' # use this ont to get better impression on recall, compared to annotationOnsets.txt, which are only on note onsets with rules of interest 
     
-    WRITE_TO_FILE = 1
+    WRITE_TO_FILE = 0
     
     
     

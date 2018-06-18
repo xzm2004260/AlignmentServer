@@ -35,6 +35,8 @@ def get_file(recording_url, alignment_id, output_dir):
     response = urlopen(recording_url)    
     a = response.read()
     
+#     a = urlretrieve(recording_url)    
+
     source_file_uri = os.path.join(output_dir, alignment_id + ext)
     with open(source_file_uri, 'wb') as f:
         f.write(a)

@@ -69,7 +69,7 @@ class Alignment(models.Model):
         null=True,
         blank=True
     )
-        
+
     timestamps  = models.TextField(_('timestamps'), blank=True, null=True)
 
     # timestamps = ArrayField(

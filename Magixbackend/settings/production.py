@@ -23,10 +23,12 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY','8lu*7g0lg)9z!ba+a$ehk)xt)x%rxgb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
+ParametersAlgo.WRITE_TO_FILE = 0
+
 ADMIN_URL = os.environ.get('DJANGO_ADMIN_URL','admin')
 
 # ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
-ALLOWED_HOSTS = ['voicemagix.com']
+ALLOWED_HOSTS = ['voicemagix.com', '127.0.0.1', 'localhost']
 
 
 
@@ -61,7 +63,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ),
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '200/day',
+        'anon': '300/day',
     }
 }
 
@@ -69,6 +71,6 @@ REST_FRAMEWORK = {
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
 
-JWT_TOKEN_EXPIRY = 10
+JWT_TOKEN_EXPIRY = 20
 
 

@@ -5,7 +5,7 @@ import os
 PATH_TEST = os.path.dirname(os.path.realpath(__file__)) 
 
 url = "http://127.0.0.1:8000/alignments/"
-f = open(os.path.join(PATH_TEST, 'data/umbrella_line.txt'), 'rb')
+f = open(os.path.join(PATH_TEST, 'example/umbrella_line.txt'), 'rb')
 
 alignment_data = MultipartEncoder(
     fields={

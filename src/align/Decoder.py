@@ -16,8 +16,7 @@ if projDir not in sys.path:
     sys.path.append(projDir)
 
 from src.align._SyllableBase import SIL_TEXT
-from src.align.LyricsParsing import expand_path_to_phonemes_list,\
-    token_list_to_line_ts
+from src.align.LyricsParsing import expand_path_to_phonemes_list, word_list_to_line_list
 from .LyricsParsing import expand_path_to_wordList, _constructTimeStampsForTokenDetected,\
     expand_path_to_SyllableList
 from .ParametersAlgo import ParametersAlgo
@@ -85,18 +84,6 @@ class Decoder(object):
         self.path = None
     
     
-
-#     def serializePosteriograms(self):
-#         import pickle
-#         URI_tmp = self.sectionLink.URIRecordingChunk + '.' + ParametersAlgo.OBS_MODEL + '.PPG.pkl'
-#         if ParametersAlgo.OBS_MODEL == 'MLP' or ParametersAlgo.OBS_MODEL == 'MLP_fuzzy':
-#             with open(URI_tmp, 'w') as f:
-#                 pickle.dump(self.hmmNetwork.mlp_posteriograms.T, f)
-#             
-#         elif ParametersAlgo.OBS_MODEL == 'GMM':
-#             with open(URI_tmp, 'w') as f:
-#                 pickle.dump(self.hmmNetwork.B_map, f)
-    
     def caclulate_Bmap(self, featureExtractor, onsetDetector=None, fromTsTextGrid=0, toTsTextGrid=0):
         '''
         initialize bmap using feature vectors
@@ -110,16 +97,7 @@ class Decoder(object):
             
             self.hmmNetwork.set_PPG_filename(self.sectionLink.URIRecordingChunk + '.' + obs_model_type + '.PPG.pkl' )
             self.hmmNetwork.setNonVocal(self.sectionLink.non_vocal_intervals)
-            
-#         if ParametersAlgo.WITH_ORACLE_PHONEMES == -1:
-#             lenFeatures = 80
-#             self._mapBStub(lenFeatures)
-#         elif ParametersAlgo.WITH_ORACLE_PHONEMES == 1: # with phoneme annotations as feature vectors
-#                 
-#                 durInSeconds = toTsTextGrid - fromTsTextGrid
-#                 lenFeatures = tsToFrameNumber(durInSeconds - ParametersAlgo.WINDOW_LENGTH / 2.0) 
-#                 self._mapBOracle( featureExtractor.featureVectors, lenFeatures, fromTsTextGrid)
-#         else: # with featureVectors
+
         self.hmmNetwork._mapB(featureExtractor.featureVectors)
 
         
@@ -134,8 +112,8 @@ class Decoder(object):
         HERE is decided which decoding scheme: with or without duration (based on WITH_DURATION parameter)
         '''
         if ParametersAlgo.DECODE_WITH_HTK:
-            detectedWordList = self.decodeAudioWithHTK()
-            return detectedWordList
+            detected_token_list = self.decodeAudioWithHTK()
+            return detected_token_list
         
         
         # standard viterbi forced alignment
@@ -160,7 +138,7 @@ class Decoder(object):
             chiBackPointer, psiBackPointer = self.hmmNetwork._viterbiForcedDur()
             
         time0 = time.time()
-        detectedWordList, self.path = self.backtrack(chiBackPointer, psiBackPointer )
+        detected_token_list, self.path = self.backtrack(chiBackPointer, psiBackPointer )
         time1 = time.time()
         logger.debug(" backtracking: {} seconds".format(time1-time0) )
 
@@ -176,7 +154,7 @@ class Decoder(object):
             
 #         self.path.printDurations() #DEBUG
         
-        return detectedWordList
+        return detected_token_list
     
 
     
@@ -253,7 +231,7 @@ class Decoder(object):
         
         if tokenLevel == 'lines':
             detectedTokenList = expand_path_to_wordList (self.sectionLink.lyricsWithModels, self.path, _constructTimeStampsForTokenDetected)
-            detectedTokenList = token_list_to_line_ts(self.sectionLink.lyricsWithModels.lyrics, detectedTokenList) # get line timestamps
+            detectedTokenList = word_list_to_line_list(self.sectionLink.lyricsWithModels.lyrics, detectedTokenList) # get line timestamps
 
         elif tokenLevel == 'words':
             if ParametersAlgo.FOR_JINGJU:

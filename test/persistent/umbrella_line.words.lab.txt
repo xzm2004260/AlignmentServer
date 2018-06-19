@@ -1,0 +1,9 @@
+because	1.53
+when	1.61
+the	1.89
+sun	2.12
+shines	2.28
+we	2.52
+shine	2.77
+together	3.26
+.	4.01

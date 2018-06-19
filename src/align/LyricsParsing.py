@@ -46,7 +46,6 @@ def expand_path_to_wordList (lyricsWithModels, path, func):
         
         currWord_and_ts, totalDuration = func( word_.text, countFirstState, countLastState, path, False)
         
-#         if currWord_and_ts[2] !=  '_SAZ_':
         wordList.append( currWord_and_ts)
     return wordList
 
@@ -57,10 +56,25 @@ def token_list_to_line_ts( lyrics, detected_token_list):
     idx_begin_line = 0
     lines_begin_ts = []
     for lyrics_line in lyrics.lyrics_lines:
-        lines_begin_ts.append(detected_token_list[idx_begin_line][0])
+        lines_begin_ts.append(detected_token_list[idx_begin_line].start_ts)
         idx_begin_line += len(lyrics_line.listWords)
     return lines_begin_ts  
 
+def word_list_to_line_list(lyrics, detected_word_list):
+    '''
+    convert the list of words to list of lines
+    '''
+    idx_begin_line = 0
+    detected_lines_list = []
+    
+    for lyrics_line in lyrics.lyrics_lines:
+        line_start_ts = detected_word_list[idx_begin_line].start_ts
+        line_token = DetectedToken( lyrics_line.text, line_start_ts)
+        detected_lines_list.append(line_token)
+
+        idx_begin_line += len(lyrics_line.listWords)
+    return detected_lines_list
+    
 def get_state_idx_word(word_, states_network):
     '''
     retrieve the indices of the first state (phoneme) and the last state(phoneme) of a given word
@@ -144,9 +158,24 @@ def expand_path_to_phonemes_list(statesNetwork, path, func):
     
     
 
-
-
-
+class DetectedToken():
+    def __init__(self, text, start_ts, end_ts=None):
+        self.start_ts = start_ts
+        self.text = text
+        if end_ts is not None:
+            self.end_ts = end_ts
+            
+    def set_end_ts(self, end_ts):
+        self.end_ts = end_ts
+    
+    def to_list(self):
+        
+        _array =  [self.text, float('{0:.2f}'.format(self.start_ts))]
+        if hasattr(self, 'end_ts'):
+            _array.append(float('{0:.2f}'.format(self.end_ts))) 
+        return _array
+    def __repr__(self):
+        return '{} {}'.format(self.text, self.start_ts) 
 
 
 def _constructTimeStampsForTokenDetected(  text, countFirstState, countLastState, path, use_end_ts=False):
@@ -157,12 +186,11 @@ def _constructTimeStampsForTokenDetected(  text, countFirstState, countLastState
         
         startTs = frameNumberToTs(currTokenBeginFrame)
         startTs = float('{0:.2f}'.format(startTs))
+        detected_token = DetectedToken( text, startTs)
         if use_end_ts:
-            endTs = frameNumberToTs(currTokenEndFrame)
-            endTs = float('{0:.2f}'.format(endTs))
-            detected_token = [startTs, endTs, text]
-        else:
-            detected_token = [startTs, text]
+            end_ts = frameNumberToTs(currTokenEndFrame)
+            end_ts = float('{0:.2f}'.format(end_ts))
+            detected_token.set_end_ts(end_ts)
 #         print detected_token
         dummy = -1
         return detected_token, dummy

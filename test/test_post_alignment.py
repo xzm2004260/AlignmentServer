@@ -37,7 +37,7 @@ class GenericTestCase(APITestCase):
         token = response.data['token']
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
         
-        self.f = open(os.path.join(PATH_TEST, 'data/umbrella_line.txt'), 'r')
+        self.f = open(os.path.join(PATH_TEST, 'example/umbrella_line.txt'), 'r')
         
         self.alignment_data = {
             'title': 'new composition',

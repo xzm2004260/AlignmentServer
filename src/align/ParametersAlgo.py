@@ -31,7 +31,7 @@ class ParametersAlgo(object):
     OBS_MODEL = 'MLP'
 #     OBS_MODEL = 'CNN' 
     
-                
+    STORE_DOTS = 1 # in labs.txt file store end-of-line tokens as dots             
     # use duraiton-based decoding (HMMDuraiton package) or just plain viterbi (HMM package) 
     # if false, use transition probabilities from htkModels
     WITH_DURATIONS= 0 # always set here only
@@ -71,13 +71,12 @@ class ParametersAlgo(object):
     THRESHOLD_PEAKS = -65
 
     
-
-    
     VISUALIZE = 0
     
     ANNOTATION_RULES_ONSETS_EXT = 'annotationOnsets.txt'
     ANNOTATION_SCORE_ONSETS_EXT = 'alignedNotes.txt' # use this ont to get better impression on recall, compared to annotationOnsets.txt, which are only on note onsets with rules of interest 
     
+
     WRITE_TO_FILE = 0
     
     

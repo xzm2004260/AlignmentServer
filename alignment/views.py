@@ -3,7 +3,7 @@ import os
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, permissions
 from rest_framework.exceptions import NotFound
 from .serializer import (
     AlignmentSerializer,
@@ -12,13 +12,16 @@ from .serializer import (
 )
 from .models import Alignment
 from services.utils import get_file
+from services.authentication import UserAuthentication
 
-settings = os.environ.get('DJANGO_SETTINGS_MODULE')
+settings_name = os.environ.get('DJANGO_SETTINGS_MODULE')
 
-if settings == 'Magixbackend.settings.test':
-    from Magixbackend.settings.test import MEDIA_ROOT
-if settings == 'Magixbackend.settings.production':
-    from Magixbackend.settings.production import MEDIA_ROOT
+
+if settings_name == 'Magixbackend.settings.test':
+    from Magixbackend.settings import test as settings
+elif settings_name == 'Magixbackend.settings.production':
+    from Magixbackend.settings import production as settings
+
 
 from alignment.thread_alignment import AlignThread
 
@@ -32,8 +35,9 @@ class CreateAlignmentAPIView(APIView):
     """
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = AlignmentSerializer
-#     permission_classes = (permissions.IsAuthenticated,)
-#     authentication_classes = (UserAuthentication,)
+    if not settings.DEBUG:
+        permission_classes = (permissions.IsAuthenticated,)
+        authentication_classes = (UserAuthentication,)
 
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -52,8 +56,9 @@ class AlignmentDetailAPIView(APIView):
        Get an existing alignment instance against some id.
 
     """
-#     permission_classes = (permissions.IsAuthenticated,)
-#     authentication_classes = (UserAuthentication,)
+    if not settings.DEBUG:
+        permission_classes = (permissions.IsAuthenticated,)
+        authentication_classes = (UserAuthentication,)
 
     def get_object(self):
         try:
@@ -74,8 +79,9 @@ class UploadAPIView(APIView):
         Get a new audio instance.
 
     """
-#     permission_classes = (permissions.IsAuthenticated,)
-#     authentication_classes = (UserAuthentication,)
+    if not settings.DEBUG:
+        permission_classes = (permissions.IsAuthenticated,)
+        authentication_classes = (UserAuthentication,)
 
     def post(self, request):
 
@@ -84,7 +90,7 @@ class UploadAPIView(APIView):
             recording_url = request.data['recording_url']
             alignment_id = request.data['alignment_id']
 #             dir_path = os.path.dirname(os.path.realpath(__file__))
-            output_dir = os.path.join(MEDIA_ROOT, 'recordings/')
+            output_dir = os.path.join(settings.MEDIA_ROOT, 'recordings/')
             recording_URI = get_file(recording_url, alignment_id, output_dir) # upload audio to server from recording URL
             align_thread = AlignThread(alignment_id, recording_URI) 
             align_thread.start()

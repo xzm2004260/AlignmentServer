@@ -1,0 +1,31 @@
+{
+
+"sections": [
+        {
+            "begin_ts": 13.6, 
+            "lyrics": "Over time, I've been building my castle of love \nJust for two, though you never knew you were my reason \nI've gone much too far for you now to say, that I've got to throw my castle away  "            
+        },
+        {
+        	"begin_ts": 48.4, 
+            "lyrics": "Over dreams, I have picked out a perfect come true \nThough you never knew it was of you I've been dreaming \nThe sandman has come from too far away, for you to say come back some other day"
+        },
+        {
+        	"begin_ts": 82.5, 
+            "lyrics": "And though you don't believe that they do, they do come true\nFor did my dreams, come true when I looked at you \nAnd maybe too, if you would believe, you too might be, overjoyed, over loved, over me  "
+        },
+        {
+        	"begin_ts": 115.8, 
+            "lyrics": "Over hearts, I have painfully turned every stone \nJust to find, I had found what I've searched to discover \nI've come much too far for me now to find, the love that I've sought could never be mine  "
+        },
+        {
+        	"begin_ts": 150.1, 
+            "lyrics": "And though you don't believe that they do, they do come true\nFor did my dreams, come true when I looked at you \nAnd maybe too, if you would believe, you too might be, overjoyed, over loved, over me  "
+        },
+        {
+        	"begin_ts": 178.1, 
+            "lyrics": "And though the odds say improbable, what do they know \nFor in romance, all true love needs is a chance \nAnd maybe with a chance you will find, you too like I overjoyed, over loved, over you, over you"
+        }
+
+
+        	]
+}

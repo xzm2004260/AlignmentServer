@@ -206,7 +206,7 @@ def writeListOfListToTextFile(listOfList, headerLine, pathToOutputFile, toFlip=F
     write output to file. 
     Reduce code redundancy: call writeCsv inside or merge the two methods
     '''
-    outputFileHandle = codecs.open(pathToOutputFile, 'w', 'utf-8')
+    outputFileHandle = codecs.open(pathToOutputFile, 'w', 'latin-1')
     csvWriter = csv.writer(outputFileHandle, delimiter='\t')
     if not headerLine == None:
         csvWriter.write(headerLine)
@@ -216,41 +216,22 @@ def writeListOfListToTextFile(listOfList, headerLine, pathToOutputFile, toFlip=F
         a = numpy.rot90(listOfList)
         listOfList = numpy.flipud(a)
     
-    for listLine in listOfList:
+    for detected_token in listOfList:
         
-        if ParametersAlgo.DETECTION_TOKEN_LEVEL == 'phonemes':
-            csvWriter.writerow(listLine)
-        elif ParametersAlgo.DETECTION_TOKEN_LEVEL == 'words':
-            outputWords(listLine, csvWriter)
-        elif ParametersAlgo.DETECTION_TOKEN_LEVEL == 'syllables':
-            for element in listLine:
+        if ParametersAlgo.DETECTION_TOKEN_LEVEL == 'syllables': # deprecated
+            for element in detected_token:
                     outputSyllables(element, csvWriter)
         
         else: 
-            sys.exit('not known type of tokens')
-    
+            if  ParametersAlgo.DETECTION_TOKEN_LEVEL == 'words' and ParametersAlgo.STORE_DOTS and detected_token.text == '': # . is a special token meaning non-vocal interval detected
+                detected_token.text = '.'
+            detected_token = detected_token.to_list()
+            csvWriter.writerow(detected_token)
+                
     outputFileHandle.close()
     
     logger.info ("successfully written file: \n {} \n".format( pathToOutputFile))
 
-def outputWords(word, writer):
-    '''
-    print a word of syllable + begin timestamp. Ignore end timestamp
-    '''
-    if len(word) < 3:
-        sys.exit(' a word has less than the minimum 3 tokens: start time, end time and text')
-    
-    if  word[-1] == '': # . is a special token meaning non-vocal interval detected
-        word[-1] = '.'
-        
-    writer.writerow([word[-1], word[0]]) # print word followed by beginning timestamp
-
-
-#         writer.write("{:35}\t".format(element))
-#             output = output + str(element) + "\t"
-#         output = output.strip()
-#         output = output + '\n'
-#         outputFileHandle.write(output)
 
 def outputSyllables(syllable, writer):
     '''
@@ -305,6 +286,7 @@ def write_decoded_to_file(detectedTokenList, detectedAlignedfileName,   phiOptPa
         '''
         
         if type(detectedTokenList) == 'str': # it is an error message 
+            logging.warning(detectedTokenList)
             sys.exit(detectedTokenList)
         
         # write to json
@@ -595,17 +577,16 @@ def addTimeShift( listTsAndTokens,   timeShift=0):
     '''
     
     for token in listTsAndTokens:
-        if ParametersAlgo.DETECTION_TOKEN_LEVEL == 'lines':
-            token += timeShift
-        elif ParametersAlgo.DETECTION_TOKEN_LEVEL in ['phonemes','words']:
-            token[0] += timeShift # begin_ts
-            token[1] += timeShift
-        elif ParametersAlgo.DETECTION_TOKEN_LEVEL == 'syllables':
+          
+        if ParametersAlgo.DETECTION_TOKEN_LEVEL == 'syllables': # deprecated
             for index in range(len(token)):
                 token[index][0] +=  timeShift # begin Ts
                 token[index][1] +=  timeShift
-            #         if (len(listTsAndTokens[index]) == 3): 
-        #             del listTsAndTokens[index][1]
+        
+        else: # words, lines, phonemes
+            token.start_ts = float('{:.2f}'.format(token.start_ts + timeShift))  
+            if hasattr(token,'end_ts'):
+                token.end_ts =   float('{:.2f}'.format(token.end_ts + timeShift)) 
                  
 #     logging.debug('phoneme level alignment written to file: ',  phonemeAlignedfileName)
     return listTsAndTokens

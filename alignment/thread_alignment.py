@@ -13,9 +13,9 @@ import time
 
 settings_name = os.environ.get('DJANGO_SETTINGS_MODULE')
 if settings_name == 'Magixbackend.settings.test':
-    from Magixbackend.settings.test import MEDIA_ROOT
+    from Magixbackend.settings import test as settings
 elif settings_name == 'Magixbackend.settings.production':
-    from Magixbackend.settings.production import MEDIA_ROOT
+    from Magixbackend.settings import production as settings
 
 from alignment.models import Alignment, Status
 parentDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__) ), os.path.pardir,os.path.pardir ))
@@ -44,8 +44,8 @@ class AlignThread (threading.Thread):
         composition_id = str(alignment.composition.id)
         
         #### set arguments 
-        lyrics_URI = os.path.join(MEDIA_ROOT, 'lyrics/', composition_id )
-        output_URI = os.path.join(MEDIA_ROOT, 'alignments/', self.alignment_id + '.lab.txt' )
+        lyrics_URI = os.path.join(settings.MEDIA_ROOT, 'lyrics/', composition_id )
+        output_URI = os.path.join(settings.MEDIA_ROOT, 'alignments/', self.alignment_id + '.lab.txt' )
         
         if not os.path.exists(self.recording_URI): # this should not happen
             sys.exit('file {} does not exist'.format(self.recording_URI) )

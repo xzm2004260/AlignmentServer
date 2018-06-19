@@ -24,8 +24,10 @@ class _SectionLinkBase():
         '''
         basename = os.path.basename(URIWholeRecording_noExtension)
 
+        self.beginTs = beginTs
+        self.endTs = endTs
         audioTmpDir = tempfile.mkdtemp()
-        self.URIRecordingChunk = os.path.join(audioTmpDir, basename + "_" + "{}".format(beginTs) + '_' + "{}".format(endTs))
+        self.URIRecordingChunk = os.path.join(audioTmpDir, basename + "_" + "{}".format(self.beginTs) + '_' + "{}".format(self.endTs))
 #         self.URIRecordingChunk = URIWholeRecording_noExtension
 
 # WITHOUT TEMP DIR: 
@@ -33,8 +35,6 @@ class _SectionLinkBase():
 #         self.URIRecordingChunk = os.path.join(dirname_, basename + "_" + "{}".format(beginTs) + '_' + "{}".format(endTs))
 
         
-        self.beginTs = beginTs
-        self.endTs = endTs
         
         # composition section. could be LyricsSection or ScoreSection
         self.section = None

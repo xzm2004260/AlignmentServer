@@ -11,6 +11,7 @@ import sys
 import time
 import numpy as np
 import scipy.io.wavfile
+from src.align.LyricsParsing import DetectedToken
 
 
 ### include src folder
@@ -116,7 +117,7 @@ class LyricsAligner():
         complete_recording_phi_segments  = []
         
         for  currSectionLink in self.recording.sectionLinks :
-                if self.recording.duration < currSectionLink.endTs:
+                if currSectionLink.endTs > self.recording.duration:
                     msg = 'Given section link ends at {} that is beyond the duration of the recording {}'.format(currSectionLink.endTs, self.recording.duration) 
                     raise RuntimeError(msg)
                     
@@ -196,6 +197,12 @@ class LyricsAligner():
         detectedTokenList = decoder.decodeAudio()             # decode most probable alignment path
         detectedTokenList = addTimeShift(detectedTokenList,  currSectionLink.beginTs)
         
+        ### make sure timetamps  of last token are not over the duraiton of recprding because of truncating  
+        last_token = detectedTokenList[-1]
+        last_token.start_ts = min(last_token.start_ts, self.recording.duration) 
+        if hasattr(last_token,'end_ts'):
+            last_token.end_ts = min(last_token.end_ts, self.recording.duration)
+        
         phi = decoder.hmmNetwork.phi
         phi_segments = decoder.path.calc_phi_segments_lines(phi, currSectionLink.lyricsWithModels) # phi score for path segments corresponding to lyrics lines
         lyrics_lines_text = currSectionLink.lyricsWithModels.lyrics.get_lyrics_lines()
@@ -220,32 +227,36 @@ def fix_non_meaningful_timestamps(existing_token_list, incoming_token_list):
     replace potentially non-monotonously increasing timestamps at the end of a section
     due to GenericRecording.TOLERANCE_END_SECTION window
     stategy: keep incoming list first token's timestamp and replace the timstamps of last tokens from existing list, 
-    by squeezing them equally in a meaningful time interval  
+    by squeezing them equally in a meaningful time interval
+    
+    NOTE: with_end_tokens not implemented  
     '''
     
     last_token_so_far = existing_token_list[-1]
-    incoming_token = incoming_token_list[0]
+    incoming_token = incoming_token_list[0] # first incoming non-end-of-line token
     
     if ParametersAlgo.DETECTION_TOKEN_LEVEL == 'phonemes':
         msg = 'section annotations not implemented with phonemes'
         raise NotImplementedError(msg)
-    if last_token_so_far[-1] == '' and incoming_token[-1] == '': # remove two repeated '.'-s
+    if last_token_so_far.text == '' and incoming_token.text == '': # remove two repeated end-of-line tokens
         del incoming_token_list[0]
     
-    incoming_token = incoming_token_list[0] # first incoming non-'.' token
-    correct_ts = incoming_token[0] # assume this time is correct 
+    incoming_token = incoming_token_list[0] # first incoming non-end-of-line token
+    correct_ts = incoming_token.start_ts # assume this time is correct 
     idx = -1
-    while existing_token_list[idx][0] > correct_ts: # reverse  a couple of previous that are not ok in ref to the ''correct'' one
+    while existing_token_list[idx].start_ts > correct_ts: # reverse  a couple of previous that are not ok in ref to the ''correct'' one
         idx-=1
-    closest_correct_ts = existing_token_list[idx][0]
+    closest_correct_ts = existing_token_list[idx].start_ts
     
+    ### fix start times based on time different to allocate
     num_incorrect_tokens = -1 - idx
     if num_incorrect_tokens != 0: # correct increasing back until the end
         idx = idx + 1
-        time_to_allocate = float(correct_ts - closest_correct_ts) 
-        time_share =  time_to_allocate / float(num_incorrect_tokens + 1)
+        total_time_to_allocate = float(correct_ts - closest_correct_ts) 
+        time_slice =  total_time_to_allocate / float(num_incorrect_tokens + 1)
         for i in range(num_incorrect_tokens):
-            existing_token_list[idx + i][0] = closest_correct_ts + float(i + 1) * time_share
+            new_start_ts = closest_correct_ts + float(i + 1) * time_slice
+            existing_token_list[idx + i].start_ts = float('{:.2f}'.format(new_start_ts))
     
     return existing_token_list
 

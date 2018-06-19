@@ -9,7 +9,7 @@ class LyricsLine(object):
     
     def __init__(self, listWords, raw_text):
         self.listWords = listWords # this is redundant to Lyrics.listWords (the sum should be the same) but could be useful
-        self.raw_text = raw_text #  string of raw line as read from the txt file
+        self.text = raw_text #  string of raw line as read from the txt file
     
 
 class Lyrics(object):
@@ -129,7 +129,7 @@ class Lyrics(object):
         
         lyrics_lines_raw_text = []
         for lyric_line in self.lyrics_lines:
-            lyrics_lines_raw_text.append(lyric_line.raw_text) 
+            lyrics_lines_raw_text.append(lyric_line.text) 
         return lyrics_lines_raw_text
     
     def __str__(self):

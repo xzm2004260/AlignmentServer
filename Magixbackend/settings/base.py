@@ -10,7 +10,9 @@ from unipath import Path
 from dj_database_url import parse as db_url
 
 from src.align.ParametersAlgo import ParametersAlgo
+import logging
 ParametersAlgo.SKIP_ALREADY_ALIGNED = 0
+ParametersAlgo.LOGGING_LEVEL = logging.WARNING
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).parent.parent.parent

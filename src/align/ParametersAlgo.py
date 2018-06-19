@@ -19,7 +19,7 @@ class ParametersAlgo(object):
     SKIP_ALREADY_ALIGNED = 0
     LOGGING_LEVEL = logging.WARNING # used in production to skip info and debug messages
 #     LOGGING_LEVEL = logging.INFO
-    LOGGING_LEVEL = logging.DEBUG
+#     LOGGING_LEVEL = logging.DEBUG
     
     POLYPHONIC = 0
 

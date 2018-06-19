@@ -8,9 +8,11 @@ import os
 from decouple import config, Csv
 from unipath import Path
 from dj_database_url import parse as db_url
+import logging
 
 from src.align.ParametersAlgo import ParametersAlgo
 ParametersAlgo.SKIP_ALREADY_ALIGNED = 0
+ParametersAlgo.LOGGING_LEVEL = logging.WARNING
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).parent.parent.parent

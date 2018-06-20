@@ -5,6 +5,8 @@ from services import exceptions
 from django.core.validators import URLValidator
 from django.db import IntegrityError, transaction
 from rest_framework.exceptions import NotFound
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import io
 
 
 class AlignmentSerializer(serializers.Serializer):
@@ -12,7 +14,8 @@ class AlignmentSerializer(serializers.Serializer):
     accompaniment = serializers.IntegerField(required=True)
     level = serializers.IntegerField(required=False)
     composition_id = serializers.CharField(max_length=100, required=False, default=None)
-    lyrics = serializers.FileField(required=False)
+    lyrics_file = serializers.FileField(required=False)
+    lyrics_text = serializers.CharField(min_length=15, required=False)
 
     class Meta:
         fields = '__all__'
@@ -48,17 +51,40 @@ class AlignmentSerializer(serializers.Serializer):
     def create(self, validated_data):
         accompaniment = validated_data.pop('accompaniment')
 
-        if self.validated_data.get('lyrics', None):
-            lyrics = validated_data.pop('lyrics')
+        if self.validated_data.get('lyrics_file', None) or self.validated_data.get('lyrics_file', None):
+            if self.validated_data.get('lyrics_file', None):
+                lyrics_file = validated_data.pop('lyrics_file')
 
-            try:
-                with transaction.atomic():
-                    if self.validated_data.get('title', None):
-                        composition_object = Composition.objects.create(lyrics=lyrics, title=validated_data.pop('title'))
-                    else:
-                        composition_object = Composition.objects.create(lyrics=lyrics)
-            except IntegrityError as e:
-                raise e.message
+                try:
+                    with transaction.atomic():
+                        if self.validated_data.get('title', None):
+                            composition_object = Composition.objects.create(lyrics=lyrics_file,
+                                                                            title=validated_data.pop('title'))
+                        else:
+                            composition_object = Composition.objects.create(lyrics=lyrics_file)
+                except IntegrityError as e:
+                    raise e.message
+            else:
+                lyrics_text = validated_data.pop('lyrics_text')
+                # lyrics_text = "hello\nworld\nthere!"
+                data = lyrics_text.encode('utf-8')
+                file_data = io.BytesIO(data)
+                file_stream = InMemoryUploadedFile(file_data, None, 'test.txt', 'text', len(data), None)
+
+                try:
+                    with transaction.atomic():
+                        if self.validated_data.get('title', None):
+                            composition_object = Composition.objects.create(
+                                lyrics=file_stream,
+                                title=validated_data.pop('title')
+                            )
+                            file_stream.close()
+                        else:
+                            composition_object = Composition.objects.create(lyrics=file_stream)
+                            file_stream.close()
+                except IntegrityError as e:
+                    raise e.message
+
 
         elif self.validated_data.get('composition_id', None):
             try:

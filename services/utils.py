@@ -3,11 +3,26 @@ import os
 import subprocess
 import sys
 import shutil
+from django.db import IntegrityError, transaction
+from composition.models import Composition
 
 
 def update_filename(instance, filename):
     return 'lyrics/{}'.format(instance.id)
-
+#
+# def composition_creation(self, file):
+#     try:
+#         with transaction.atomic():
+#             if self.validated_data.get('title', None):
+#                 composition_object = Composition.objects.create(
+#                     lyrics=file,
+#                     title=self.validated_data.pop('title')
+#                 )
+#             else:
+#                 composition_object = Composition.objects.create(lyrics=file)
+#             return composition_object
+#     except IntegrityError as e:
+#         raise e.message
 
 def get_file(recording_url, alignment_id, output_dir):
     '''

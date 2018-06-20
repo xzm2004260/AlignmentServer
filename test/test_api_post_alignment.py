@@ -39,16 +39,37 @@ class GenericTestCase(APITestCase):
         
         self.f = open(os.path.join(PATH_TEST, 'example/umbrella_line.txt'), 'r')
         
-        self.alignment_data = {
+
+        self.alignment_data_variants = [{
             'title': 'new composition',
             'accompaniment': 2,
-            'lyrics': self.f
-         }
+            'lyrics_file': self.f
 
-        self.pre_post_count_aligns = Alignment.objects.count()
-        self.pre_post_count_compositions = Composition.objects.count()
+         }
+#          ,
+#          {
+#             'title': 'new composition',
+#             'accompaniment': 2,
+#             'lyrics': 'line1\nlinw2\nline3'
+# 
+#          }
+         ]
         
-        self.post_response = self.client.post(reverse('create-alignment'), self.alignment_data, format='multipart') # create one alignment object
+        self.not_complete_data_variants = [
+        {
+            'lyrics_file': self.f
+        },
+        {
+            'lyrics': 'line1\nline2\nline3'
+        },
+        {
+            'accompaniment': 2
+        },
+        {
+            'composition_id':1
+        }
+        ]
+        
 
 
 
@@ -67,46 +88,35 @@ class PostAlignmentTestCase(GenericTestCase):
             'level': 1,
             'composition_id': -1
          }
+        
 
         
-    def test_not_complete_data(self):
-
-        """Tests missing required fields."""
-
-        not_complete_data_variants = [
-        {
-            'lyrics': self.f
-        },
-        {
-            'accompaniment': 2
-        },
-        {
-            'composition_id':1
-        }
-        ]
-        for not_complete_data in not_complete_data_variants:
-            post_response = self.client.post(reverse('create-alignment'), not_complete_data, format='multipart') # create one alignment object
-            self.assertEqual(post_response.status_code, status.HTTP_400_BAD_REQUEST)
-
+   
     @pytest.mark.django_db
     def test_api_post_alignment(self):
         """
-        Test the api has alignment creation capability.
-
-        Command:
-        pytest alignment/tests
+        Test the api has alignment creation capability. 
+        THe number of compositions and alignments has to increase by one on correct alignment post
+        Checks two cases: lyrics (as string) and lyrics_file
+        Command: pytest alignment/tests
 
         """
-        num_aligns_added = Alignment.objects.count() - self.pre_post_count_aligns
-        num_compositions_added = Composition.objects.count() - self.pre_post_count_compositions
-
-        self.assertEqual(self.post_response.status_code, status.HTTP_201_CREATED)
-        # self.assertTrue(parse(self.post_response.data['lyrics']).path.startswith(settings.MEDIA_URL))
-        self.assertIn('alignment_id', self.post_response.data)
-        self.assertEqual(num_aligns_added, 1)
-
-        # self.assertIn('lyrics', self.post_response.data)
-        self.assertEqual(num_compositions_added, 1)
+        for alignment_data in self.alignment_data_variants:
+            
+            pre_post_count_aligns = Alignment.objects.count()
+            pre_post_count_compositions = Composition.objects.count()
+            post_response = self.client.post(reverse('create-alignment'), alignment_data, format='multipart') # create one alignment object
+    
+            num_aligns_added = Alignment.objects.count() - pre_post_count_aligns
+            num_compositions_added = Composition.objects.count() - pre_post_count_compositions
+    
+            self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
+            # self.assertTrue(parse(self.post_response.data['lyrics']).path.startswith(settings.MEDIA_URL))
+            self.assertIn('alignment_id', post_response.data)
+            self.assertEqual(num_aligns_added, 1)
+    
+            # self.assertIn('lyrics', self.post_response.data)
+            self.assertEqual(num_compositions_added, 1)
 
     @pytest.mark.django_db
     def test_api_post_alignment_by_comp_id(self):
@@ -115,24 +125,25 @@ class PostAlignmentTestCase(GenericTestCase):
         pytest alignment/tests
 
         """
+        post_response = self.client.post(reverse('create-alignment'), self.alignment_data_variants[0], format='multipart') # create one alignment object
 
         pre_post_count_aligns = Alignment.objects.count()
         pre_post_count_compositions = Composition.objects.count()
 
-        query_set = Composition.objects.filter(title=self.alignment_data['title']) # get the just uploaded composition
+        query_set = Composition.objects.filter(title=self.alignment_data_variants[0]['title']) # get the just uploaded composition
 
         self.assertEqual(Composition.objects.count(), 1)
 
         composition = query_set[0] # there is only one composition with this name
 
         comp_id = composition.id
-        alignment_data_by_comp_id = {
+        alignment_data = {
             'title': 'test title 2',
             'accompaniment': 2,
             'level': 1,
             'composition_id': comp_id
          }
-        post_response = self.client.post(reverse('create-alignment'), alignment_data_by_comp_id) # create one alignment object
+        post_response = self.client.post(reverse('create-alignment'), alignment_data) # create one alignment object
         num_aligns_added = Alignment.objects.count() - pre_post_count_aligns
         num_compositions_added = Composition.objects.count() - pre_post_count_compositions
 
@@ -140,6 +151,15 @@ class PostAlignmentTestCase(GenericTestCase):
         self.assertEqual(num_aligns_added, 1)
         self.assertEqual(num_compositions_added, 0)
 
+    def test_not_complete_data(self):
+        """Tests missing required fields."""
+
+
+        for not_complete_data in self.not_complete_data_variants:
+            post_response = self.client.post(reverse('create-alignment'), not_complete_data, format='multipart') # create one alignment object
+            self.assertEqual(post_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    
     @pytest.mark.django_db
     def test_api_post_alignment_wrong_id(self):
         post_response = self.client.post(reverse('create-alignment'), self.alignment_data_by_comp_id)
@@ -160,7 +180,7 @@ class PostAlignmentTestCase(GenericTestCase):
         pytest alignment/tests
 
         """
-        self.post_response = self.client.post(reverse('create-alignment'), self.alignment_data) # create one alignment object
+        post_response = self.client.post(reverse('create-alignment'), self.alignment_data_variants[0]) # create one alignment object
 
         alignment = Alignment.objects.get(id=1) # assume that there the first alignment object has id=1 
         response_from_get = self.client.get(

@@ -6,6 +6,7 @@ Created on 10/05/2018
 import pytest
 import os
 import sys
+from django.urls.base import reverse
 
 projDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__) ), os.path.pardir))
 if projDir not in sys.path:
@@ -13,7 +14,7 @@ if projDir not in sys.path:
     
 from alignment.thread_alignment import AlignThread
 from alignment.models import Alignment
-from test.test_post_alignment import GenericTestCase
+from test.test_api_post_alignment import GenericTestCase
 from tl.testing.thread import ThreadJoiner
 
 testDir = os.path.dirname(os.path.realpath(__file__))
@@ -31,7 +32,9 @@ class AlignmentResultTestCase(GenericTestCase):
         stub for uploading audio (using test audio recording)
         '''
         
-        alignment_id = self.post_response.json()['alignment_id']
+        post_response = self.client.post(reverse('create-alignment'), self.alignment_data_variants[0], format='multipart') # create one alignment object
+
+        alignment_id = post_response.json()['alignment_id']
         
         with ThreadJoiner(100):
             ### run alignment with given test audio, skip uploading the audio by API method

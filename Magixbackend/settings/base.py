@@ -8,6 +8,7 @@ import os
 from decouple import config, Csv
 from unipath import Path
 from dj_database_url import parse as db_url
+import logging
 
 from src.align.ParametersAlgo import ParametersAlgo
 import logging

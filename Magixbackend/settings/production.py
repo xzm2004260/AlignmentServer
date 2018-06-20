@@ -28,7 +28,7 @@ ParametersAlgo.WRITE_TO_FILE = 0
 ADMIN_URL = os.environ.get('DJANGO_ADMIN_URL','admin')
 
 # ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
-ALLOWED_HOSTS = ['voicemagix.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['api.voicemagix.com', '127.0.0.1', 'localhost']
 
 
 

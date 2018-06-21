@@ -1,4 +1,6 @@
 -r base.txt
 
+
 pytest==3.5.0
 pytest-django==3.2.1
+tl.testing

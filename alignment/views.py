@@ -1,7 +1,7 @@
 import os
 
 from rest_framework.views import APIView
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from rest_framework.exceptions import NotFound
@@ -33,7 +33,7 @@ class CreateAlignmentAPIView(APIView):
         Create a new alignment with composition instance.
 
     """
-    parser_classes = (MultiPartParser, FormParser)
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
     serializer_class = AlignmentSerializer
     if not settings.DEBUG:
         permission_classes = (permissions.IsAuthenticated,)

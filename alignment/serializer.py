@@ -51,7 +51,7 @@ class AlignmentSerializer(serializers.Serializer):
     def create(self, validated_data):
         accompaniment = validated_data.pop('accompaniment')
 
-        if self.validated_data.get('lyrics_file', None) or self.validated_data.get('lyrics_file', None):
+        if self.validated_data.get('lyrics_file', None) or self.validated_data.get('lyrics_text', None):
             if self.validated_data.get('lyrics_file', None):
                 lyrics_file = validated_data.pop('lyrics_file')
 

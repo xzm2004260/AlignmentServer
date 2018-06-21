@@ -2,9 +2,7 @@ from urllib.request import urlopen
 import os
 import subprocess
 import sys
-import shutil
-from django.db import IntegrityError, transaction
-from composition.models import Composition
+# from django.db import IntegrityError, transaction
 
 
 def update_filename(instance, filename):

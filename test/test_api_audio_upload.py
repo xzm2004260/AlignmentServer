@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.urls.base import reverse
 from rest_framework import status
 
-from test.test_post_alignment import PATH_TEST, GenericTestCase
+from test.test_api_post_alignment import PATH_TEST, GenericTestCase
 import os
 
 settings = os.environ.get('DJANGO_SETTINGS_MODULE')
@@ -31,8 +31,9 @@ class UploadAudioTestCase(GenericTestCase):
             calls  AlignmentTestCase.setUp(self):
         """
 
-        
-        alignment_id = self.post_response.json()['alignment_id']
+        post_response = self.client.post(reverse('create-alignment'), self.alignment_data_variants[0], format='multipart') # create one alignment object
+
+        alignment_id = post_response.json()['alignment_id']
         data_upload = {
             'recording_url': recording_URL,
             'alignment_id': alignment_id

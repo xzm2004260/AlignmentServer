@@ -66,10 +66,12 @@ class UploadAudioTestCase(GenericTestCase):
     def test_api_upload_not_complete_data(self):
 
         """Tests missing required fields."""
+        
+        post_response = self.client.post(reverse('create-alignment'), self.alignment_data_variants[0], format='multipart') # create one alignment object
 
         self.not_complete_data_variants = [
             {
-                'alignment_id': self.post_response.json()['alignment_id']
+                'alignment_id': post_response.json()['alignment_id']
             },
             {
                 'recording_url': recording_URL

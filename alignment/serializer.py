@@ -67,9 +67,11 @@ class AlignmentSerializer(serializers.Serializer):
             else:
                 lyrics_text = validated_data.pop('lyrics_text')
                 # lyrics_text = "hello\nworld\nthere!"
-                data = lyrics_text.encode('utf-8')
-                file_data = io.BytesIO(data)
-                file_stream = InMemoryUploadedFile(file_data, None, 'test.txt', 'text', len(data), None)
+                lyrics_text_encoded = lyrics_text.encode('latin-1')
+#                 lines = lyrics_text_encoded.split('\n')
+                file_data = io.StringIO()
+                len_ = file_data.write(lyrics_text)
+                file_stream = InMemoryUploadedFile(file_data, None, 'test.txt', 'text', len_, None)
 
                 try:
                     with transaction.atomic():

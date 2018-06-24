@@ -10,7 +10,18 @@ from django.contrib.auth.models import User
 
 PATH_TEST = os.path.dirname(os.path.realpath(__file__)) 
 
-TEST_LYRICS = 'Came in from a rainy Thursday on the avenue\nThought I heard you talking softly\nI turned on the lights, the TV, and the radioStill I can_t escape the ghost of you\n\nWhat has happened to it all?\nCrazy someone say\nWhere is the life that I recognize?\nGone away'
+#### the contents of example/umbrella_3lines.txt hhas to be the same as TEST_LYRICS
+TEST_LYRICS_FILE_URI = os.path.join(PATH_TEST, 'example/umbrella_3lines.txt')
+TEST_LYRICS = "because when the sun shines we shine together\ntold you i'll be here forever\nsaid i'll always be your friend"
+
+
+settings_name = os.environ.get('DJANGO_SETTINGS_MODULE')
+
+
+if settings_name == 'Magixbackend.settings.test':
+    from Magixbackend.settings import test as settings
+elif settings_name == 'Magixbackend.settings.production':
+    from Magixbackend.settings import production as settings
 
 class GenericTestCase(APITestCase):
     """
@@ -38,20 +49,20 @@ class GenericTestCase(APITestCase):
         token = response.data['token']
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
         
-        self.f = open(os.path.join(PATH_TEST, 'example/umbrella_line.txt'), 'r')
+        self.f = open(TEST_LYRICS_FILE_URI, 'r')
         
         self.content_types = ['multipart','json'] # the first alignment_data_variants needs multipart because of the file
         self.alignment_data_variants = [
         {
             'title': 'new composition',
-            'accompaniment': 2,
+            'accompaniment': 1,
             'lyrics_file': self.f
  
          }
         ,
         {
            'title': 'new composition',
-           'accompaniment': 2,
+           'accompaniment': 1,
 #            'lyrics_text': 'line1\nlinw2\nline3'
            'lyrics_text': TEST_LYRICS
         }
@@ -62,7 +73,7 @@ class GenericTestCase(APITestCase):
             'lyrics_file': self.f
         },
         {
-            'lyrics_text': 'line1\nline2\nline3'
+            'lyrics_text': TEST_LYRICS
         },
         {
             'accompaniment': 2
@@ -72,8 +83,6 @@ class GenericTestCase(APITestCase):
         }
         ]
         
-
-
 
 
 class PostAlignmentTestCase(GenericTestCase):
@@ -103,21 +112,32 @@ class PostAlignmentTestCase(GenericTestCase):
         Command: pytest alignment/tests
 
         """
-        for i, alignment_data in enumerate(self.alignment_data_variants):
+        for i, alignment_data in enumerate([self.alignment_data_variants[1] ]):
             
             pre_post_count_aligns = Alignment.objects.count()
             pre_post_count_compositions = Composition.objects.count()
             post_response = self.client.post(reverse('create-alignment'), alignment_data, format=self.content_types[i]) # create one alignment object
     
-            num_aligns_added = Alignment.objects.count() - pre_post_count_aligns
-            num_compositions_added = Composition.objects.count() - pre_post_count_compositions
     
             self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
-            # self.assertTrue(parse(self.post_response.data['lyrics']).path.startswith(settings.MEDIA_URL))
+            
+            ### assert composition in  response
+            self.assertIn('composition_id', post_response.data)
+
+            ##### assert lyrics are fine
+            comp_id = post_response.data['composition_id']
+            composition = Composition.objects.get(id=comp_id)
+            self.assertIn(settings.MEDIA_ROOT, composition.lyrics.path)
+            lyrics_lines = composition.lyrics.readlines() # the content of the saved lyrics text file
+            check_lyrics(lyrics_lines)
+            
+            #### assert 1 alignment object created
             self.assertIn('alignment_id', post_response.data)
-            self.assertEqual(num_aligns_added, 1)
-    
-            # self.assertIn('lyrics', self.post_response.data)
+            num_aligns_added = Alignment.objects.count() - pre_post_count_aligns
+            self.assertEqual(num_aligns_added, 1)   
+            
+            #### assert 1 composition object created
+            num_compositions_added = Composition.objects.count() - pre_post_count_compositions
             self.assertEqual(num_compositions_added, 1)
 
     @pytest.mark.django_db
@@ -132,13 +152,12 @@ class PostAlignmentTestCase(GenericTestCase):
         pre_post_count_aligns = Alignment.objects.count()
         pre_post_count_compositions = Composition.objects.count()
 
-        query_set = Composition.objects.filter(title=self.alignment_data_variants[0]['title']) # get the just uploaded composition
 
         self.assertEqual(Composition.objects.count(), 1)
 
-        composition = query_set[0] # there is only one composition with this name
-
-        comp_id = composition.id
+        comp_id = post_response.data['composition_id']
+#         composition = Composition.objects.get(id=comp_id)
+        
         alignment_data = {
             'title': 'test title 2',
             'accompaniment': 2,
@@ -195,3 +214,14 @@ class PostAlignmentTestCase(GenericTestCase):
         self.assertEqual(len(alignment_object), 8) # an alignment object has 8 fields
         self.assertEqual(alignment_object['level'], 1) # an alignment level is set by defaul to 1 (=Words)
         self.assertEqual(alignment_object['status'], 1) # an alignment status is set by defaul to 1 (=Not started)
+
+def check_lyrics(lyrics_lines):
+    '''
+    compares given input to the reference TEST_LYRICS_FILE_URI
+    '''
+    with open(TEST_LYRICS_FILE_URI) as f:
+        reference_lines = f.readlines()
+    assert len(lyrics_lines) == len(reference_lines)
+    for i,line in enumerate(lyrics_lines):
+        line = line.decode('latin-1')
+        assert line.strip() == reference_lines[i].strip()

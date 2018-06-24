@@ -22,6 +22,11 @@ if settings == 'Magixbackend.settings.production':
 recording_URL = 'http://htftp.offroadsz.com/marinhaker/drugi/mp3/Soundtrack%20-%20Rocky/Rocky%20IV%20(1985)/01%20-%20Survivor%20-%20Burning%20Heart.mp3'
 # recording_URL = os.path.join(MEDIA_ROOT, 'recordings/umbrella_line.mp3' )
 
+# signed url. expired
+signed_recording_URL = 'https://flowra-audio-recordings.s3.amazonaws.com/5b23e1cf6ba8f0282d19039c.mp3?AWSAccessKeyId=AKIAIOV6UBGWVLCNHMNA&Expires=1529087597&Signature=TrZ5Whn4iHF9mFpaO56f%2BYwQGgk%3D'
+
+wrong_recording_URL = 'https://flowra-audio-recordings.s3.amazonaws.com/5b23e1cf6ba8f0282d19039c.mp'
+
 class UploadAudioTestCase(GenericTestCase):
     
     @pytest.mark.django_db
@@ -53,7 +58,6 @@ class UploadAudioTestCase(GenericTestCase):
 
         """Tests uploading audio to non-existing alignment_id."""
 
-
         data_upload = {
             'recording_url': recording_URL,
             'alignment_id': -1
@@ -62,7 +66,29 @@ class UploadAudioTestCase(GenericTestCase):
         post_response = self.client.post(reverse('upload-audio'), data_upload) # upload audio
         self.assertEqual(post_response.status_code, status.HTTP_404_NOT_FOUND)
 
+    
+    def test_api_upload_wrong_url(self):
 
+        """Tests uploading audio to url that does not indicate the URL type."""
+
+        post_response = self.client.post(reverse('create-alignment'), self.alignment_data_variants[1], format='json') # create one alignment object
+        alignment_id = post_response.json()['alignment_id']
+
+        upload_data_variants = [{
+            'recording_url': wrong_recording_URL,
+            'alignment_id': alignment_id
+        },
+        {
+            'recording_url': signed_recording_URL,
+            'alignment_id': alignment_id
+        }              
+        ]
+        
+        for data_upload in upload_data_variants:
+            upload_response = self.client.post(reverse('upload-audio'), data_upload) # upload audio
+            self.assertEqual(upload_response.status_code, status.HTTP_404_NOT_FOUND)
+
+    
     def test_api_upload_not_complete_data(self):
 
         """Tests missing required fields."""

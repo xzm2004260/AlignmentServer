@@ -91,7 +91,12 @@ class UploadAPIView(APIView):
             alignment_id = request.data['alignment_id']
 #             dir_path = os.path.dirname(os.path.realpath(__file__))
             output_dir = os.path.join(settings.MEDIA_ROOT, 'recordings/')
-            recording_URI = get_file(recording_url, alignment_id, output_dir) # upload audio to server from recording URL
+            try:
+                recording_URI = get_file(recording_url, alignment_id, output_dir) # upload audio to server from recording URL
+            except (RuntimeError) as error:
+                print(error)
+                return Response(str(error), status=status.HTTP_404_NOT_FOUND)
+
             align_thread = AlignThread(alignment_id, recording_URI) 
             align_thread.start()
             return Response("Audio uploaded successfully", status=status.HTTP_201_CREATED)

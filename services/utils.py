@@ -1,4 +1,5 @@
 from urllib.request import urlopen
+from urllib.error import HTTPError
 import os
 import subprocess
 import sys
@@ -45,16 +46,28 @@ def get_file(recording_url, alignment_id, output_dir):
     stripped_url = recording_url.strip()
     extensions = ['mp3', 'wav', 'mp4', 'm4a', 'ogg']  # here  are some supported by ffmpeg
     splitted_url = re.split(r'[\@#%&+\[\];\'\\:"|<,./<>?]', stripped_url)
+    extension_file = None
     for ext in extensions:
-        if ext not in splitted_url:
-            sys.exit('not acceptable extension') # TODO: throw a http response with explanatory error
-
-    response = urlopen(recording_url)    
+        if ext in splitted_url:
+            extension_file = ext
+            
+    if extension_file == None: # if name not in list, we have no audio in URL
+       raise RuntimeError("None of the expected file extensions (.mp3, .ogg etc.) for audio found in given URL")
+    
+    try:            
+        response = urlopen(recording_url)
+    except HTTPError as err:
+        if err.code == 403: # we care to inform the user for this type of error that happens on signed urls
+            msg = 'The given url is forbidden. Are you sure you are authorized to access it?' 
+        else:
+            msg = err.reason
+        raise RuntimeError(msg)
+ 
     a = response.read()
     
 #     a = urlretrieve(recording_url)    
 
-    source_file_uri = os.path.join(output_dir, alignment_id + ext)
+    source_file_uri = os.path.join(output_dir, alignment_id + extension_file)
     with open(source_file_uri, 'wb') as f:
         f.write(a)
 

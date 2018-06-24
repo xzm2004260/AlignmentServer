@@ -2,6 +2,7 @@ from urllib.request import urlopen
 import os
 import subprocess
 import sys
+import re
 # from django.db import IntegrityError, transaction
 
 
@@ -39,12 +40,15 @@ def get_file(recording_url, alignment_id, output_dir):
     '''
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
-    
-    # TODO: get automatically file type
-    ext = os.path.splitext(recording_url)[1]
-    if ext not in ['.mp3', '.wav', '.mp4', '.m4a','.ogg']: # here  are some supported by ffmpeg
-        sys.exit('not acceptable extension')  # TODO: throw a http response with explanatory error
-    
+
+    # url = "https://flowra-.com/5b23e1cf6ba8f0282d19039c.mps/AWSAccessKeyId=AKIAIOV6UBGWVLCNHMNA&Expires=1529087597&Signature=TrZ5Whn4iHF9mFpaO56f%2BYwQGgk%3D"
+    stripped_url = recording_url.strip()
+    extensions = ['mp3', 'wav', 'mp4', 'm4a', 'ogg']  # here  are some supported by ffmpeg
+    splitted_url = re.split(r'[\@#%&+\[\];\'\\:"|<,./<>?]', stripped_url)
+    for ext in extensions:
+        if ext not in splitted_url:
+            sys.exit('not acceptable extension') # TODO: throw a http response with explanatory error
+
     response = urlopen(recording_url)    
     a = response.read()
     

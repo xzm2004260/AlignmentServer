@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 from rest_framework import status
 from django.urls import reverse
@@ -112,7 +114,7 @@ class PostAlignmentTestCase(GenericTestCase):
         Command: pytest alignment/tests
 
         """
-        for i, alignment_data in enumerate([self.alignment_data_variants[1] ]):
+        for i, alignment_data in enumerate(self.alignment_data_variants ):
             
             pre_post_count_aligns = Alignment.objects.count()
             pre_post_count_compositions = Composition.objects.count()

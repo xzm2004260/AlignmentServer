@@ -231,7 +231,7 @@ class Decoder(object):
         
         if tokenLevel == 'lines':
             detectedTokenList = expand_path_to_wordList (self.sectionLink.lyricsWithModels, self.path, _constructTimeStampsForTokenDetected)
-            detectedTokenList = word_list_to_line_list(self.sectionLink.lyricsWithModels.lyrics, detectedTokenList) # get line timestamps
+            detectedTokenList = word_list_to_line_list(self.sectionLink.lyricsWithModels.lyrics, detectedTokenList, ParametersAlgo.END_TS) # get line timestamps
 
         elif tokenLevel == 'words':
             if ParametersAlgo.FOR_JINGJU:

@@ -37,6 +37,8 @@ def setUp_test_lyrics_input(with_section_annotations, with_shortest_audio=True):
         if with_shortest_audio:
             #### this data has  shorter processing time. input data for assert for this case
             lyrics_filename = 'example/umbrella_line.txt'
+            if ParametersAlgo.DETECTION_TOKEN_LEVEL == 'lines':         # in test_decoded_path_to one can use with_shortest_audio=False. So we need to store the path for them. 
+                lyrics_filename = 'example/umbrella_line_split.txt'
             audioFileURI = os.path.join(testDir, 'example/umbrella_line.wav')
 
 #####  whole 4-minute recording

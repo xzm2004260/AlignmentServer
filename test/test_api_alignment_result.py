@@ -32,7 +32,7 @@ class AlignmentResultTestCase(GenericTestCase):
         stub for uploading audio (using test audio recording)
         '''
         
-        post_response = self.client.post(reverse('create-alignment'), self.alignment_data_variants[0], format='multipart') # create one alignment object
+        post_response = self.client.post(reverse('create-alignment'), self.alignment_data_variants[0], format='json') # create one alignment object
 
         alignment_id = post_response.json()['alignment_id']
         

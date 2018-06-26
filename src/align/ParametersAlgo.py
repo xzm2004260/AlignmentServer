@@ -39,6 +39,7 @@ class ParametersAlgo(object):
     WITH_ORACLE_ONSETS = -1 ### no onsets at all
     
     USE_PERSISTENT_PPGs = 0
+    END_TS = 0
     
     # level into which to segments decoded result stateNetwork
 #     DETECTION_TOKEN_LEVEL= 'syllables'

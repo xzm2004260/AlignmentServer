@@ -92,22 +92,29 @@ def test_path_to_tokenlist():
        path_raw = json.load(f)
     path = Path() 
     path.setPathRaw(path_raw)
-
+    
+    ParametersAlgo.END_TS = 1
+    
     for ParametersAlgo.DETECTION_TOKEN_LEVEL in ['lines','phonemes', 'words']:
     
-        with_section_annotations = 0 # no persistent tokens for phonemes in other test  cases prepared
+        with_section_annotations = 0 # no persistent tokens  prepared for phonemes in  with_section_annotations={1,2}
         
         ### prepare lyrics of recording. do not change input, run_backtrack hard coded to work with umbrella_line
         recording = setUp_recording(with_section_annotations, with_shortest_audio=True)
-        recording.sectionLinks[0].createLyricsModels()
+        recording.sectionLinks[0].createLyricsModels() # 1 section only becasue  with_section_annotations = 0
         lyrics_models = recording.sectionLinks[0].lyricsWithModels
         
         if ParametersAlgo.DETECTION_TOKEN_LEVEL == 'lines':
             #  line timestamps from each first word in line
             detectedTokenList = expand_path_to_wordList (lyrics_models, path, _constructTimeStampsForTokenDetected)            
-            lines_begin_ts = word_list_to_line_list(lyrics_models.lyrics, detectedTokenList)
-            assert "because when the sun shines we shine together" == lines_begin_ts[0].text
-            assert 1.53 == lines_begin_ts[0].start_ts
+            detected_lines_list = word_list_to_line_list(lyrics_models.lyrics, detectedTokenList, ParametersAlgo.END_TS)
+            assert "because when the sun shines" == detected_lines_list[0].text
+            assert 1.53 == detected_lines_list[0].start_ts
+            assert 2.52 == detected_lines_list[0].end_ts
+            
+            assert "we shine together" == detected_lines_list[1].text
+            assert 2.62 == detected_lines_list[1].start_ts
+            assert 4.02 == detected_lines_list[1].end_ts
         else:
             if ParametersAlgo.DETECTION_TOKEN_LEVEL == 'words': 
                 detectedTokenList = expand_path_to_wordList (lyrics_models, path, _constructTimeStampsForTokenDetected)            

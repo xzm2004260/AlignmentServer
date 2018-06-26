@@ -7,6 +7,7 @@ from django.db import IntegrityError, transaction
 from rest_framework.exceptions import NotFound
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import io
+from src.align.ParametersAlgo import ParametersAlgo
 
 
 class AlignmentSerializer(serializers.Serializer):
@@ -16,7 +17,8 @@ class AlignmentSerializer(serializers.Serializer):
     composition_id = serializers.CharField(max_length=100, required=False, default=None)
     lyrics_file = serializers.FileField(required=False)
     lyrics_text = serializers.CharField(min_length=15, required=False)
-
+    end_times = serializers.IntegerField(required=False)
+    
     class Meta:
         fields = '__all__'
 
@@ -66,9 +68,6 @@ class AlignmentSerializer(serializers.Serializer):
                     raise e.message
             else:
                 lyrics_text = validated_data.pop('lyrics_text')
-                # lyrics_text = "hello\nworld\nthere!"
-                lyrics_text_encoded = lyrics_text.encode('latin-1')
-#                 lines = lyrics_text_encoded.split('\n')
                 file_data = io.StringIO()
                 len_ = file_data.write(lyrics_text)
                 file_stream = InMemoryUploadedFile(file_data, None, 'test.txt', 'text', len_, None)
@@ -101,7 +100,14 @@ class AlignmentSerializer(serializers.Serializer):
             alignment = Alignment.objects.create(composition=composition_object, accompaniment=accompaniment, level=validated_data.pop('level'))
         else:
             alignment = Alignment.objects.create(composition=composition_object, accompaniment=accompaniment)
-
+            
+        if self.validated_data.get('end_times', None):
+            end_times = validated_data.pop('end_times') ### set end ts
+            if end_times == 1:
+                ParametersAlgo.END_TS = 0
+            elif end_times == 2:
+                ParametersAlgo.END_TS = 1
+                        
         return alignment
 
     def to_representation(self, instance):

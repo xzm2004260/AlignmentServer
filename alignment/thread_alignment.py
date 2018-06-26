@@ -63,13 +63,22 @@ class AlignThread (threading.Thread):
             ParametersAlgo.POLYPHONIC = 0
         elif alignment.accompaniment == 2:
             ParametersAlgo.POLYPHONIC = 1
+
         
         
         try:
             detected_word_list =  align_CMU(self.recording_URI, lyrics_URI, output_URI, with_section_anno, vocal_intervals_URI ) #  align
             if with_section_anno == 0:
                 detected_word_list = detected_word_list[0] # one section only
-            alignment.timestamps = str(detected_word_list)
+            
+            ########### convert list of DectedToken to easily parsable objects 
+            detected_word_list_as_token_lists = []
+            for detected_token in detected_word_list:
+                token_as_list = detected_token.to_list()
+                detected_word_list_as_token_lists.append(token_as_list)
+                
+            alignment.timestamps  = str(detected_word_list_as_token_lists)
+            
             alignment.error_reason = None
             alignment.status = Status.DONE # update status alignment
         except (RuntimeError, FileNotFoundError, NotImplementedError) as error:

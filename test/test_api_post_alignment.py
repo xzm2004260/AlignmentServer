@@ -205,7 +205,8 @@ class PostAlignmentTestCase(GenericTestCase):
         """
         post_response = self.client.post(reverse('create-alignment'), self.alignment_data_variants[0]) # create one alignment object
 
-        alignment = Alignment.objects.get(id=1) # assume that there the first alignment object has id=1 
+        alignment_id = post_response.data['alignment_id']
+        alignment = Alignment.objects.get(id=alignment_id) # assume that there the first alignment object has id=1 
         response_from_get = self.client.get(
             reverse('alignment-detail', kwargs={'pk': alignment.pk}),
             format='json'

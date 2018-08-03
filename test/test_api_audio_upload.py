@@ -14,10 +14,10 @@ import os
 
 settings = os.environ.get('DJANGO_SETTINGS_MODULE')
 
-if settings == 'Magixbackend.settings.test':
-    from Magixbackend.settings.test import MEDIA_ROOT
-if settings == 'Magixbackend.settings.production':
-    from Magixbackend.settings.production import MEDIA_ROOT
+if settings == 'config.settings.test':
+    from config.settings.test import MEDIA_ROOT
+if settings == 'config.settings.production':
+    from config.settings.production import MEDIA_ROOT
     
 recording_URL = 'http://htftp.offroadsz.com/marinhaker/drugi/mp3/Soundtrack%20-%20Rocky/Rocky%20IV%20(1985)/01%20-%20Survivor%20-%20Burning%20Heart.mp3'
 # recording_URL = os.path.join(MEDIA_ROOT, 'recordings/umbrella_line.mp3' )

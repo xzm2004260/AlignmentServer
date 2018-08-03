@@ -1,5 +1,5 @@
 """
-WSGI config for Magixbackend project.
+WSGI config for AlignmentServer project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -10,6 +10,6 @@ https://docs.djangoproject.com/en/2.0/howto/deployment/wsgi/
 import os
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Magixbackend.test_settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.test_settings")
  
 application = get_wsgi_application() # this is on development

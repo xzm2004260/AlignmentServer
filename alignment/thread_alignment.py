@@ -12,10 +12,10 @@ import time
 
 
 settings_name = os.environ.get('DJANGO_SETTINGS_MODULE')
-if settings_name == 'Magixbackend.settings.test':
-    from Magixbackend.settings import test as settings
-elif settings_name == 'Magixbackend.settings.production':
-    from Magixbackend.settings import production as settings
+if settings_name == 'config.settings.debug':
+    from config.settings import debug as settings
+elif settings_name == 'config.settings.production':
+    from config.settings import production as settings
 
 from alignment.models import Alignment, Status
 parentDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__) ), os.path.pardir,os.path.pardir ))
@@ -52,7 +52,7 @@ class AlignThread (threading.Thread):
         
 #         if not os.path.exists(output_URI): # align
 
-        with_section_anno=0 # works only with no annotation sections timestamps
+        with_section_anno=2 # works only with no annotation sections timestamps
         vocal_intervals_URI=None
         if alignment.level == 1: ### set level
             ParametersAlgo.DETECTION_TOKEN_LEVEL = 'words'

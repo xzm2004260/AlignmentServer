@@ -1,5 +1,5 @@
 """
-WSGI config for Magixbackend project.
+WSGI config.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,7 +11,7 @@ import os
 from django.core.wsgi import get_wsgi_application
 from dj_static import Cling, MediaCling
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Magixbackend.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
  
 # application = get_wsgi_application() # this is on development
 

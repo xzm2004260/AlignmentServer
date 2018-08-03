@@ -56,7 +56,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'Magixbackend.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {

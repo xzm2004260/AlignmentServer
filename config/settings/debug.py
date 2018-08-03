@@ -3,7 +3,7 @@ from .base import *
 DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY','8lu*7g0lg)9z!ba+a$ehk)xt)x%rxgb$i1&amp;022shmi1jcgihb*')
 
-WSGI_APPLICATION = 'Magixbackend.test_wsgi.application'
+WSGI_APPLICATION = 'config.test_wsgi.application'
 
 
 

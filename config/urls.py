@@ -1,5 +1,5 @@
 
-"""Magixbackend URL Configuration
+""" URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.0/topics/http/urls/
@@ -16,10 +16,10 @@ Including another URLconf
 """
 import os
 settings_name = os.environ.get('DJANGO_SETTINGS_MODULE')
-if settings_name == 'Magixbackend.settings.test':
-    from Magixbackend.settings import test as settings
-elif settings_name == 'Magixbackend.settings.production':
-    from Magixbackend.settings import production as settings
+if settings_name == 'config.settings.debug':
+    from config.settings import debug as settings
+elif settings_name == 'config.settings.production':
+    from config.settings import production as settings
 
 from django.contrib import admin
 from django.conf.urls import url, include

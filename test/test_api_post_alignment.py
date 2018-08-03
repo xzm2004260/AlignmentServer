@@ -20,10 +20,10 @@ TEST_LYRICS = "because when the sun shines we shine together\ntold you i'll be h
 settings_name = os.environ.get('DJANGO_SETTINGS_MODULE')
 
 
-if settings_name == 'Magixbackend.settings.test':
-    from Magixbackend.settings import test as settings
-elif settings_name == 'Magixbackend.settings.production':
-    from Magixbackend.settings import production as settings
+if settings_name == 'config.settings.test':
+    from config.settings import test as settings
+elif settings_name == 'config.settings.production':
+    from config.settings import production as settings
 
 class GenericTestCase(APITestCase):
     """

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta
-from Magixbackend import settings
+from config import settings
 import jwt
 
 

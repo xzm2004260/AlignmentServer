@@ -130,9 +130,6 @@ class Decoder(object):
             logger.debug(" Viterbi: {} seconds".format(time1-time0) )
 
             chiBackPointer = None
-#            for kimseye region with note onsets for ISMIR poster SHi-KA-YET:
-#             if ParametersAlgo.VISUALIZE:
-#                 self.hmmNetwork.visualize_trans_probs(self.sectionLink.lyricsWithModels, 685,1095, 13,19)
         
         else:   # duration-HMM
             chiBackPointer, psiBackPointer = self.hmmNetwork._viterbiForcedDur()

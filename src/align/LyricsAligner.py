@@ -144,6 +144,7 @@ class LyricsAligner():
                 decoders.append(decoder)
                 if len(complete_recording_detected_token_list) > 0 and self.recording.with_section_anno == 2: # do not check at first section/line
                     complete_recording_detected_token_list = fix_non_meaningful_timestamps(complete_recording_detected_token_list, currSectionLink.detectedTokenList) # this is introduced for lines, it should not be needed for sections
+                
                 complete_recording_detected_token_list.extend(currSectionLink.detectedTokenList)
                 complete_recording_phi_segments.extend(lines_max_phi_segments)
 

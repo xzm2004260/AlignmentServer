@@ -7,7 +7,7 @@ import re
 import codecs
 import json
 import sys
-
+import pylrc
 
 
 def load_section_annotations(lyrics_URI):
@@ -179,3 +179,17 @@ def load_section_annotations_json(lyrics_URI):
             section_lyrics.append( lyrics )
       
     return begin_timestamps, section_lyrics
+
+
+def parse_lrc(lrc_file_URI):
+    '''
+    parse lyrics and timestamps from lrc files
+    '''
+    with codecs.open(lrc_file_URI, 'rU', encoding='latin-1') as lrc_file:
+        lrc_string = ''.join(lrc_file.readlines())
+    subtitles = pylrc.parse(lrc_string)
+    timestamps = []; txt_lines = []
+    for subtitle in subtitles:
+        timestamps.append(subtitle.time)
+        txt_lines.append(subtitle.text)
+    return  timestamps, txt_lines

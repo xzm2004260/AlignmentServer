@@ -22,7 +22,7 @@ from .ParametersAlgo import ParametersAlgo
 import mir_eval
 import logging
 from src.utilsLyrics.UtilsLyricsParsing import strip_line, load_section_annotations,\
-    load_delimited
+    load_delimited, parse_lrc
 import scipy.io.wavfile
 
 if ParametersAlgo.FOR_JINGJU:    
@@ -95,7 +95,8 @@ class GenericRecording():
 
             
         elif with_section_anno == 2: # each line is a section. 
-            start_times, lines = load_delimited(lyrics_URI, [float, str], delimiter='\t')
+#             start_times, lines = load_delimited(lyrics_URI, [float, str], delimiter='\t')
+            start_times, lines = parse_lrc(lyrics_URI)
             end_times = self.derive_end_times_sections(start_times) 
             lyrics_arr = []
             for line in lines: # separate lyric object for each line
@@ -378,3 +379,5 @@ def lines_to_lyrics( language, lines):
 
     lyrics = Lyrics(list_lyrics_lines=lyrics_lines_list)
     return lyrics
+
+

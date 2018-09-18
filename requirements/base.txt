@@ -22,4 +22,6 @@ Theano
 https://github.com/Lasagne/Lasagne/archive/master.zip
 
 # pip install -e git+https://github.com/pwdyson/inflect.py#egg=inflect; # do manually
+# sudo pip install -e git+https://github.com/doakey3/pylrc.git#egg=pylrc # do manually
+
 # git clone https://github.com/georgid/pdnn.git; cd pdnn; git pull origin python3; git checkout python3 # branch that supports python3 # do manually

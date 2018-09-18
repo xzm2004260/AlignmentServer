@@ -201,11 +201,13 @@ def readListTextFile(fileURI):
 
 
 
-def writeListOfListToTextFile(listOfList, headerLine, pathToOutputFile, toFlip=False):    
+def writeListOfListToTextFile(detected_token_list: list, headerLine, pathToOutputFile, toFlip=False):    
     '''
     write output to file. 
     Reduce code redundancy: call writeCsv inside or merge the two methods
+    :params detected_token_list: list [list [str]] 
     '''
+    
     outputFileHandle = codecs.open(pathToOutputFile, 'w', 'latin-1')
     csvWriter = csv.writer(outputFileHandle, delimiter='\t')
     if not headerLine == None:
@@ -213,19 +215,27 @@ def writeListOfListToTextFile(listOfList, headerLine, pathToOutputFile, toFlip=F
     
     # flip (transpose) matrix
     if toFlip:
-        a = numpy.rot90(listOfList)
-        listOfList = numpy.flipud(a)
+        a = numpy.rot90(detected_token_list)
+        detected_token_list = numpy.flipud(a)
     
-    for detected_token in listOfList:
+    counter_cons_dots = 0 # consecutive dots
+    for detected_token in detected_token_list:
         
         if ParametersAlgo.DETECTION_TOKEN_LEVEL == 'syllables': # deprecated
             for element in detected_token:
                     outputSyllables(element, csvWriter)
         
-        else: 
-            if  ParametersAlgo.DETECTION_TOKEN_LEVEL == 'words' and ParametersAlgo.STORE_DOTS and detected_token.text == '': # . is a special token meaning non-vocal interval detected
-                detected_token.text = '.'
+        else: # words or lines 
+            if  ParametersAlgo.DETECTION_TOKEN_LEVEL == 'words':
+                if detected_token.text == '': # . is a special token meaning non-vocal interval detected
+                    if ParametersAlgo.STORE_DOTS: 
+                        detected_token.text = '.'
+                    counter_cons_dots +=1 # counter
+                else: # not a dot,  so reset counter
+                    counter_cons_dots = 0 
             detected_token = detected_token.to_list()
+            if counter_cons_dots > 1: # do not store consecutive empty spaces (dots)  
+                continue
             csvWriter.writerow(detected_token)
                 
     outputFileHandle.close()

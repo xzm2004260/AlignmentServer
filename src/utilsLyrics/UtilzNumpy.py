@@ -18,18 +18,6 @@ def detail_array_differences(array1, array2):
     print([(array1[i], array2[i], i) for i in indices])
 
 
-def areArraysEqual(array1, array2):
-    ''' 
-    compare numpy arrays with assertion exception
-    '''
-    try:
-        res = np.testing.assert_array_almost_equal_nulp(array1, array2, 10)
-        
-    except Exception as inst: # if not equal we enter here
-        print(inst)
-        return False
-    return True
-
 def assertListsEqual(list1, list2):
     '''
     assert python lists are equal

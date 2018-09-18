@@ -57,9 +57,11 @@ def prepare_detected_and_reference_data(detectedTokenList, detection_token_level
         test_file_basis = 'persistent/talkin_in_my_sleep.sections.'
     elif with_section_annotations == 2:
         test_file_basis = 'persistent/talkin_in_my_sleep.timed_lines.'
-
-    
-    reference_detected_token_list_URI = os.path.join(testDir, test_file_basis + detection_token_level + '.lab.txt')
+    if ParametersAlgo.POLYPHONIC:
+        test_file_name = test_file_basis + detection_token_level + '.poly.lab.txt'
+    else:
+        test_file_name = test_file_basis + detection_token_level + '.lab.txt'
+    reference_detected_token_list_URI = os.path.join(testDir, test_file_name)
     if detection_token_level == 'phonemes':
         reference_tokens, reference_start_times, _ = load_delimited(reference_detected_token_list_URI, [str, float, float], delimiter='\t')
     elif detection_token_level == 'words' or detection_token_level == 'lines':
@@ -75,7 +77,7 @@ def parse_tokens_section(detected_start_times, deteceted_tokens, token_list):
     '''
     for token in token_list:
         detected_start_times.append(token.start_ts)
-        if token.text == '': # this does not make sence for level phonemes
+        if token.text == '' and ParametersAlgo.STORE_DOTS: # DANGER: this does not make sence for level phonemes
             token.text = '.'
         deteceted_tokens.append(token.text) # load persistently stored
 
@@ -83,7 +85,6 @@ def test_path_to_tokenlist():
     '''
     test the conversion of detected path to a detected token list. in other words tests method   expand_path_to_<s.th>_List
     Tests two token levels: words and phonemes
-    
     
     '''
     ### load stored path

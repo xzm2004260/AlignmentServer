@@ -7,6 +7,8 @@ import os
 import sys
 import json
 import logging
+import numpy as np
+
 
 projDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__) ), os.path.pardir))
 if projDir not in sys.path:
@@ -52,7 +54,8 @@ def setUp_test_lyrics_input(with_section_annotations, with_shortest_audio=True):
     elif with_section_annotations == 1:    
         lyrics_filename = 'example/talkin_in_my_sleep.sections.txt'
     elif with_section_annotations == 2:    
-        lyrics_filename = 'example/talkin_in_my_sleep.timed_lines.txt'
+        lyrics_filename = 'example/talkin_in_my_sleep.timed_lines.lrc'
+#         lyrics_filename = 'example/talkin_in_my_sleep.timed_lines.txt'
     lyrics_URI =  os.path.join(testDir, lyrics_filename)
 #     lyrics_URI =  os.path.join(testDir, 'example/lyrics_with_spanish.txt')
 
@@ -107,7 +110,7 @@ def test_load_section_annotations():
 #     TODO: add here also test_load_lyrics_sections 
 
 
-def test_load_lyrics_lines():
+def test_load_lyrics_timed_lines():
     '''
     load lyrics as .txt file 
     '''
@@ -129,7 +132,9 @@ def test_load_lyrics_lines():
         all_begin_ts.append(section_link.beginTs)
     
     assert all_lyrics == persistent_lyrics
-    assert all_begin_ts == [13.310417, 15.139583, 17.939583, 21.669792, 23.8, 25.880208, 29.710417, 32.789583, 37.139583, 40.930208, 46.180208, 48.4, 49.7]    
+    
+    reference_line_times = np.array([13.310417, 15.139583, 17.939583, 21.669792, 23.8, 25.880208, 29.710417, 32.789583, 37.139583, 40.930208, 46.180208, 48.4, 49.7])
+    assert np.allclose(np.array(all_begin_ts), reference_line_times, atol=1e-03)
 
 ###### code for generating the reference test output    
 #     all_lyrics = []
@@ -142,4 +147,4 @@ def test_load_lyrics_lines():
 
 if __name__ == '__main__':
 #     test_load_lyrics()
-    test_load_section_annotations
+    test_load_lyrics_timed_lines()

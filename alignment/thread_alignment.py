@@ -35,6 +35,8 @@ class AlignThread (threading.Thread):
         self.alignment_id = alignment_id
         self.recording_URI = recording_URI 
       
+
+
     def run(self):
         logging.info ("Starting alignment for alignment id " + str(self.alignment_id))
         
@@ -52,7 +54,6 @@ class AlignThread (threading.Thread):
         
 #         if not os.path.exists(output_URI): # align
 
-        with_section_anno=2 # works only with no annotation sections timestamps
         vocal_intervals_URI=None
         if alignment.level == 1: ### set level
             ParametersAlgo.DETECTION_TOKEN_LEVEL = 'words'
@@ -64,20 +65,12 @@ class AlignThread (threading.Thread):
         elif alignment.accompaniment == 2:
             ParametersAlgo.POLYPHONIC = 1
 
-        
-        
         try:
-            detected_word_list =  align_CMU(self.recording_URI, lyrics_URI, output_URI, with_section_anno, vocal_intervals_URI ) #  align
-            if with_section_anno == 0:
+            detected_word_list =  align_CMU(self.recording_URI, lyrics_URI, output_URI, ParametersAlgo.WITH_SECTION_ANNO, vocal_intervals_URI ) #  align
+            if ParametersAlgo.WITH_SECTION_ANNO == 0:
                 detected_word_list = detected_word_list[0] # one section only
             
-            ########### convert list of DectedToken to easily parsable objects 
-            detected_word_list_as_token_lists = []
-            for detected_token in detected_word_list:
-                token_as_list = detected_token.to_list()
-                detected_word_list_as_token_lists.append(token_as_list)
-                
-            alignment.timestamps  = str(detected_word_list_as_token_lists)
+            alignment.timestamps  = convert_to_list(detected_word_list)
             
             alignment.error_reason = None
             alignment.status = Status.DONE # update status alignment
@@ -91,3 +84,14 @@ class AlignThread (threading.Thread):
         alignment.save()
         logging.info ("Finishing alignment for alignment id  " + str(self.alignment_id))
 
+
+def convert_to_list(detected_word_list):
+    '''convert list of DectedToken to easily parsable objects'''
+    
+    word_list_with_timestamps = []
+    for detected_token in detected_word_list:
+        token_as_list = detected_token.to_list()
+        word_list_with_timestamps.append(token_as_list)
+    
+    word_list_with_timestamps_str = str(word_list_with_timestamps)
+    return word_list_with_timestamps_str

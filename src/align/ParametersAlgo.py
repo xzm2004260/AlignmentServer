@@ -21,7 +21,9 @@ class ParametersAlgo(object):
 #     LOGGING_LEVEL = logging.INFO
 #     LOGGING_LEVEL = logging.DEBUG
     
-    POLYPHONIC = 0
+    WITH_SECTION_ANNO = 2
+    
+    POLYPHONIC = 1
 
     FOR_JINGJU = 0
     FOR_MAKAM = 0
@@ -78,7 +80,7 @@ class ParametersAlgo(object):
     ANNOTATION_SCORE_ONSETS_EXT = 'alignedNotes.txt' # use this ont to get better impression on recall, compared to annotationOnsets.txt, which are only on note onsets with rules of interest 
     
 
-    WRITE_TO_FILE = 0
+    WRITE_TO_FILE = 1
     
     
     

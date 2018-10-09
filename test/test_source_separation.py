@@ -8,6 +8,8 @@ import sys
 from test.test_load_lyrics import setUp_recording
 from src.align.ParametersAlgo import ParametersAlgo
 import scipy.io.wavfile
+from src.align.separate import separate
+from src.align.FeatureExtractor import MODEL_PATH
 
 projDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__) ), os.path.pardir))
 if projDir not in sys.path:
@@ -43,5 +45,16 @@ def test_separate():
         scipy.io.wavfile.write(filename=file_name, rate=recording.sample_rate, data=audio) # write back to file, because htk needs to read a file
         os.remove(file_name)
 
+def test_run_separation():
+    audio_path = '/Users/joro/Documents/pandora+karoke_songs/taylor_swift_karaoke.wav'
+    audio_path = '/Users/joro/Documents/pandora+karoke_songs/taylor_swift_original.wav'
+
+    sample_rate, audio = scipy.io.wavfile.read(audio_path)
+    model_URI = os.path.join(MODEL_PATH, 'krast.dad')
+    audio_sep = separate(audio, model_URI, 0.3, 30, 25, 32, 513)
+    scipy.io.wavfile.write(filename= '/Users/joro/Documents/pandora+karoke_songs/taylor_swift_original_vocal.wav', rate=sample_rate, data=audio_sep) # write back to file, because htk needs to read a file
+
+
 if __name__ == '__main__':
-    test_separate()
+#     test_separate()
+    test_run_separation()

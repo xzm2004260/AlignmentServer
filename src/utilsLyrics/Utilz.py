@@ -310,7 +310,8 @@ def write_decoded_to_file(detectedTokenList, detectedAlignedfileName,   phiOptPa
         # write phi (likelihood of path) to json
         if phiOptPath is not None:
             from csv import writer
-            with open(detectedAlignedfileName[:-7] + 'conf.txt', 'w') as f:
+            detectest_URI_no_ext = os.path.splitext(detectedAlignedfileName)[0]
+            with open(detectest_URI_no_ext + '.conf', 'w') as f:
                 w = writer(f, delimiter='\t')
                 w.writerow(['TOTAL', format(phiOptPath, '.3f')])
                 for recording_phi_segment in recording_phi_segments:

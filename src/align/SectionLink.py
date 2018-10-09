@@ -28,7 +28,6 @@ class _SectionLinkBase():
         self.endTs = endTs
         audioTmpDir = tempfile.mkdtemp()
         self.URIRecordingChunk = os.path.join(audioTmpDir, basename + "_" + "{}".format(self.beginTs) + '_' + "{}".format(self.endTs))
-#         self.URIRecordingChunk = URIWholeRecording_noExtension
 
 # WITHOUT TEMP DIR: 
 #         dirname_ = os.path.dirname(URIWholeRecording_noExtension)

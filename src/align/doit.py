@@ -87,8 +87,8 @@ def align_CMU(audioFileURI, lyrics_URI,  output_URI, with_section_annotations=0,
     
 def doit_CMU(argv):
     
-    if len(argv) != 6 and len(argv) != 5:
-        sys.exit('usage: {} <audio_URI> <lyrics_URI> <with_section_anno> (optional: <vocal_intervals>) <output.lab>'.format(argv[0]))
+    if len(argv) != 7 and len(argv) != 6:
+        sys.exit('usage: {} <audio_URI> <lyrics_URI> <with_section_anno> <polyphonic> (optional: <vocal_intervals>) <output.lab>'.format(argv[0]))
     
 
         # setting both to 0 means default (English)
@@ -98,7 +98,6 @@ def doit_CMU(argv):
     # test with section links. polyphonic
 
 #     # test of audio working 
-    ParametersAlgo.POLYPHONIC = 1
     ParametersAlgo.WITH_ORACLE_ONSETS = -1
     ParametersAlgo.WITH_ORACLE_PHONEMES = 0
     # set WITH_DURATIONS in ParametersAlgo. it cannot be set here
@@ -110,12 +109,14 @@ def doit_CMU(argv):
     audioFileURI = argv[1]
     lyrics_URI = argv[2]
     with_section_anno = int(argv[3])
-    if len(argv) == 6:
-        vocal_intervals_URI = argv[4]
-        output_URI = argv[5]
+    ParametersAlgo.POLYPHONIC = int(argv[4])
+    
+    if len(argv) == 7:
+        vocal_intervals_URI = argv[5]
+        output_URI = argv[6]
     else:
         vocal_intervals_URI = None
-        output_URI = argv[4]
+        output_URI = argv[5]
     try:    
         ret = align_CMU(audioFileURI, lyrics_URI, output_URI, with_section_anno, vocal_intervals_URI )
         print(ret)

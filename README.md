@@ -1,3 +1,34 @@
+Lyric-Find Dataset
+--------------
+Cross-check audio from LF and annoation present from Mauch and Gracenote
+Case 1) separation with DeepConvSep
+Case 2) separation with Audionamix
+
+1. check that lyrics .lrc have are the same as .wordonsets (and respectively .txt) or at least that they have same num tokens
+Load in beyond compare .txt and .lrc.
+
+2. Make sure that the annotation corresponds to the audio from LF
+- open in audacity
+- python ~/workspace/lakh_vocal_segments_dataset/scripts/shift_time_annotaion.py ~/Documents/VOICE_magix/Lyric_find/19-lyrics/ABBA\ -\ Knowing\ Me\,\ Knowing\ You.wordonset.tsv <time1>
+Assume that the line-level annotation has no errors.
+
+3. Time shift audio of the _vocal.wav_ version with same <time1>
+
+
+
+4. Align
+source ~/.virtualenvs/alana/bin/activate
+python3 ~/workspace/AlignmentServer/scripts/run_all_lyric_find.py 0 for case 1 and 
+python3 ~/workspace/AlignmentServer/scripts/run_all_lyric_find.py 1 for case 2
+
+5. Eval
+case 1)
+python /Users/joro/workspace/AlignmentEvaluation/align_eval/eval.py       "/Users/joro/Documents/VOICE_magix/Lyric_find/19-lyrics/" "/Users/joro/Documents/VOICE_magix/Lyric_find/19-lyrics/" . 0.5
+
+case 2)
+python /Users/joro/workspace/AlignmentEvaluation/align_eval/eval.py       "/Users/joro/Documents/VOICE_magix/Lyric_find/19-lyrics/" "/Users/joro/Documents/VOICE_magix/Lyric_find/19-lyrics/audionamix_separated/" . 0.5
+
+
 Magix Backend
 ----------------
 Magix is a Music Technology product. A software based on Artificial Intelligence that

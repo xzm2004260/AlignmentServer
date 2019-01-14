@@ -44,11 +44,12 @@ def doit(argv):
     
     for wav in wav_files:
          basename = os.path.splitext(wav)[0]
-    
+         if separation_audionamix:
+             basename = basename[:-6] # -6 : skip the automatically generated -vocal suffix
     # with _vocal_suffix
          if separation_audionamix: 
     # no vocal suffix
-             a = ['python3', '/Users/joro/workspace/AlignmentServer/src/align/doit.py', f'{wav}',f'{basename[:-6]}.txt','2','0', f'{basename[:-6]}.lab'] # -6 : skip the automatically generated -vocal suffix
+             a = ['python3', '/Users/joro/workspace/AlignmentServer/src/align/doit.py', f'{wav}',f'{basename}.txt','2','0', f'{basename}.lab'] # 
          else:
              a = ['python3', '/Users/joro/workspace/AlignmentServer/src/align/doit.py', f'{wav}',f'{basename}.txt','2', '1',f'{basename}.lab'] # 
     

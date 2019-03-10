@@ -44,18 +44,18 @@ libavcodec-dev libavformat-dev libavutil-dev libavresample-dev \
 python-dev libsamplerate0-dev libtag1-dev python-numpy-dev git
 
 RUN git clone -b pabloEntropia-viterbi-forced https://github.com/georgid/essentia
+WORKDIR /essentia
 RUN python ./waf configure --with-python --include-algos=MelBands,TriangularBands,DCT,MFCC,FrameCutter,Viterbi,FileOutputProxy --arch=x64 --pythondir=/usr/local/lib/python2.7/site-packages/
 RUN sudo python ./waf install
 
 # theano and lasagne
-# RUN pip install theano
-# RUN pip install https://github.com/Lasagne/Lasagne/archive/master.zip # last working version of Lasagne
+RUN pip install theano
+RUN pip install https://github.com/Lasagne/Lasagne/archive/master.zip # last working version of Lasagne
 
 # utility dependencies
-cd $ALIGNMENT_MAGIX
-RUN pip install -r requirements
-cd $ALIGNMENT_MAGIX/../
-RUN pip install -e git+https://github.com/pwdyson/inflect.py#egg=inflect; cd inflect; python setup.py install
+# cd $ALIGNMENT_MAGIX
+RUN pip install -r $ALIGNMENT_MAGIX/requirements/production.txt
+
 
 # HTK
 RUN \
@@ -67,8 +67,8 @@ RUN \
 
 # pdnn
 # @see https://www.cs.cmu.edu/~ymiao/pdnntk.html
-cd $ALIGNMENT_MAGIX/../
-RUN git clone https://github.com/yajiemiao/pdnn
+#cd $ALIGNMENT_MAGIX/../
+#RUN git clone https://github.com/yajiemiao/pdnn
 
 # env
 ENV PYTHONPATH $ALIGNMENT_MAGIX/../pdnn:$PYTHONPATH

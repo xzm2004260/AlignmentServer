@@ -34,9 +34,9 @@ RUN pip install --upgrade pip
 
 
 # essentia dependencies
-#RUN apt-get install -y libyaml-0-2 libfftw3-3 libtag1v5 libsamplerate0 \ 
-#libavcodec-ffmpeg56 libavformat-ffmpeg56 libavutil-ffmpeg54 \
-#libavresample-ffmpeg2 python python-numpy libpython2.7 python-numpy python-yaml python-six
+RUN apt-get install -y libyaml-0-2 libfftw3-3 libtag1v5 libsamplerate0 \ 
+libavcodec-ffmpeg56 libavformat-ffmpeg56 libavutil-ffmpeg54 \
+libavresample-ffmpeg2 python python-numpy libpython2.7 python-numpy python-yaml python-six
 
 # git and its dependencies
 RUN apt-get install -y build-essential libyaml-dev libfftw3-dev \

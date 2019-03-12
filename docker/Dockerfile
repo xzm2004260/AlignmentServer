@@ -43,24 +43,20 @@ RUN apt-get install -y build-essential libyaml-dev libfftw3-dev \
 libavcodec-dev libavformat-dev libavutil-dev libavresample-dev \
 python-dev libsamplerate0-dev libtag1-dev python-numpy-dev git
 
-# NEEDS USERNAME
-#RUN git clone -b pabloEntropia-viterbi-forced https://github.com/georgid/essentia
-#WORKDIR /essentia
-#RUN python ./waf configure --with-python --include-algos=MelBands,TriangularBands,DCT,MFCC,FrameCutter,Viterbi,FileOutputProxy --arch=x64 --pythondir=/usr/local/lib/python2.7/site-packages/
-#RUN sudo python ./waf install
+# install essentia
+RUN git clone -b pabloEntropia-viterbi-forced https://github.com/georgid/essentia
+WORKDIR $HOME/essentia
+RUN python ./waf configure --with-python --include-algos=MelBands,TriangularBands,DCT,MFCC,FrameCutter,Viterbi,FileOutputProxy --arch=x64 --pythondir=/usr/local/lib/python3.5/site-packages/
+RUN python ./waf install
 
-# theano and lasagne
-RUN pip install theano
-RUN pip install https://github.com/Lasagne/Lasagne/archive/master.zip # last working version of Lasagne
 
-# NEEDS USERNAME
 # Alignment dependencies
-# cd $ALIGNMENT_MAGIX
-#RUN git clone https://github.com/georgid/AlignmentServer.git
-#RUN pip install -r AlignmentServer/requirements/production.txt
+#RUN git clone https://georgid:7Navuhodonosor@github.com/georgid/AlignmentServer.git
+#RUN pip install -r $HOME/AlignmentServer/requirements/production.txt
 
 
 # HTK
+WORKDIR $HOME
 RUN \
     git clone https://github.com/loretoparisi/htk.git && \
     cd $HOME/htk && \
@@ -68,13 +64,18 @@ RUN \
     make all && \
     make install
 
-# NEEDS USERNAME
-# pdnn
-# @see https://www.cs.cmu.edu/~ymiao/pdnntk.html
-#cd $ALIGNMENT_MAGIX/../
-#RUN git clone https://github.com/yajiemiao/pdnn
+
+# TODO: pdnn # @see https://www.cs.cmu.edu/~ymiao/pdnntk.html
+#WORKDIR $HOME
+#RUN git clone -b python3 https://github.com/georgid/pdnn.git
+
+# postgres
+RUN apt-get install -y postgresql postgresql-contrib
+
 
 # env
-ENV PYTHONPATH $ALIGNMENT_MAGIX/../pdnn:$PYTHONPATH
+ENV PYTHONPATH $HOME/pdnn:$PYTHONPATH
+
+EXPOSE 8000
 
 CMD ["bash"]

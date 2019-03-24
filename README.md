@@ -4,10 +4,10 @@ Cross-check audio from LF and annoation present from Mauch and Gracenote
 Case 1) separation with DeepConvSep
 Case 2) separation with Audionamix
 
-1. check that lyrics .lrc have are the same as .wordonsets (and respectively .txt) or at least that they have same num tokens
+1. check that lyrics .lrc are the same as .wordonsets (and respectively .txt) or at least that they have same num tokens
 Load in beyond compare .txt and .lrc.
 
-2. Make sure that the annotation corresponds to the audio from LF
+2. Make sure that the annotation .wordonsets corresponds to the audio from LF
 - open in audacity
 - python ~/workspace/lakh_vocal_segments_dataset/scripts/shift_time_annotaion.py ~/Documents/VOICE_magix/Lyric_find/19-lyrics/ABBA\ -\ Knowing\ Me\,\ Knowing\ You.wordonset.tsv <time1>
 Assume that the line-level annotation has no errors.

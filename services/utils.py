@@ -67,7 +67,7 @@ def get_file(recording_url, alignment_id, output_dir):
     
 #     a = urlretrieve(recording_url)    
 
-    source_file_uri = os.path.join(output_dir, alignment_id + extension_file)
+    source_file_uri = os.path.join(output_dir, alignment_id + '.' + extension_file)
     with open(source_file_uri, 'wb') as f:
         f.write(a)
 

@@ -10,6 +10,7 @@ MAINTAINER Georgi Dzhambazov <info@voicemagix.com>
 
 # working directory
 ENV HOME /Users/joro/Downloads/
+ENV LANG C.UTF-8
 WORKDIR $HOME
 
 
@@ -21,7 +22,9 @@ RUN apt-get install -y \
     python-dev \
     python-pip \
     curl \
-    git
+    git psmisc
+
+RUN ln -s /usr/bin/python3 python
 
 # pip
 RUN pip install --upgrade pip
@@ -46,7 +49,7 @@ python-dev libsamplerate0-dev libtag1-dev python-numpy-dev git
 # install essentia
 RUN git clone -b pabloEntropia-viterbi-forced https://github.com/georgid/essentia
 WORKDIR $HOME/essentia
-RUN python ./waf configure --with-python --include-algos=MelBands,TriangularBands,DCT,MFCC,FrameCutter,Viterbi,FileOutputProxy --arch=x64 --pythondir=/usr/local/lib/python3.5/site-packages/
+RUN python ./waf configure --with-python --include-algos=MelBands,TriangularBands,DCT,MFCC,FrameCutter,Viterbi,FileOutputProxy --arch=x64 --pythondir=/usr/local/lib/python3.5/dist-packages/
 RUN python ./waf install
 
 
@@ -77,5 +80,9 @@ RUN apt-get install -y postgresql postgresql-contrib
 ENV PYTHONPATH $HOME/pdnn:$PYTHONPATH
 
 EXPOSE 8000
+
+# needed because /usr/local/bin path is hardcoded in code
+RUN ln -s /usr/bin/ffmpeg /usr/local/bin/ffmpeg 
+
 
 CMD ["bash"]

@@ -68,9 +68,10 @@ class AlignThread (threading.Thread):
         try:
             detected_word_list =  align_CMU(self.recording_URI, lyrics_URI, output_URI, ParametersAlgo.WITH_SECTION_ANNO, vocal_intervals_URI ) #  align
             if ParametersAlgo.WITH_SECTION_ANNO == 0:
-                detected_word_list = detected_word_list[0] # one section only
-            
-            alignment.timestamps  = convert_to_list(detected_word_list)
+                flattened_detected_word_list = detected_word_list[0] # one section only
+            else:
+                flattened_detected_word_list = [item for section_detedted_word_list in detected_word_list for item in section_detedted_word_list]
+            alignment.timestamps  = convert_to_list(flattened_detected_word_list)
             
             alignment.error_reason = None
             alignment.status = Status.DONE # update status alignment

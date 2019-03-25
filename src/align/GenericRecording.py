@@ -53,9 +53,11 @@ class GenericRecording():
         self.mbRecordingID = 'dummy_recid'
         
         self.recordingNoExtURI = os.path.splitext(audioFileURI)[0]  
-        self.sample_rate, self.audio = scipy.io.wavfile.read(self.recordingNoExtURI + '.wav') # load audio as float array using scipy.    
-        self.duration = get_duration_audio(self.recordingNoExtURI + '.wav')
-        
+        try:
+            self.sample_rate, self.audio = scipy.io.wavfile.read(self.recordingNoExtURI + '.wav') # load audio as float array using scipy.    
+            self.duration = get_duration_audio(self.recordingNoExtURI + '.wav')
+        except Exception as e:
+            raise RuntimeError(e)
         
         path, fileName = os.path.split(audioFileURI)
         path, self.which_fold = os.path.split(path) # which Fold

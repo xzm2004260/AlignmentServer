@@ -52,7 +52,8 @@ def get_file(recording_url, alignment_id, output_dir):
             extension_file = ext
             
     if extension_file == None: # if name not in list, we have no audio in URL
-       raise RuntimeError("None of the expected file extensions (.mp3, .ogg etc.) for audio found in given URL")
+       extensions_list = ','.join(extensions)
+       raise RuntimeError(f"None of the expected file extensions {extensions_list} for audio found in given URL")
     
     try:            
         response = urlopen(recording_url)
@@ -70,11 +71,16 @@ def get_file(recording_url, alignment_id, output_dir):
     source_file_uri = os.path.join(output_dir, alignment_id + '.' + extension_file)
     with open(source_file_uri, 'wb') as f:
         f.write(a)
-
+    
+    if extension_file == 'wav':
+        return source_file_uri
 #     shutil.copy(recording_url, source_file_uri)
     
     recording_URI = os.path.join(output_dir, alignment_id + '.wav')
-    pipe = subprocess.check_call(['/usr/local/bin/ffmpeg', '-y', '-i', source_file_uri, recording_URI]) # convert to wav
+    try:
+        pipe = subprocess.check_call(['/usr/local/bin/ffmpeg', '-y', '-i', source_file_uri, recording_URI]) # convert to wav
 #     pipe.wait()
-    
+    except Exception as e:
+        raise RuntimeError(f'Conversion to .wav of the provided audio failed. Are you sure the {extension_file} format has no missing header or similar errors ?  \n Alternatively try uploading a wav file instead')
+      
     return recording_URI

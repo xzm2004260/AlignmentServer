@@ -28,8 +28,7 @@ ParametersAlgo.WRITE_TO_FILE = 0
 ADMIN_URL = os.environ.get('DJANGO_ADMIN_URL','admin')
 
 # ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
-ALLOWED_HOSTS = ['3.17.28.160', 'api.voicemagix.com', '127.0.0.1', 'localhost']
-
+ALLOWED_HOSTS = ['18.218.209.161','3.17.28.160', 'api.voicemagix.com', '127.0.0.1', 'localhost']
 
 
 WSGI_APPLICATION = 'config.wsgi.application'
@@ -71,6 +70,6 @@ REST_FRAMEWORK = {
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
 
-JWT_TOKEN_EXPIRY = 20
+JWT_TOKEN_EXPIRY = 30
 
 

@@ -101,7 +101,7 @@ $ python manage.py createsuperuser --username=mirza123 --email=mirza@gmail.com /
 - Give unique username to the concerned clients so that they can change password with given username at 
   endpoint http://localhost:8000/auth/password/change
 - After changing old password to new one, users can sign in at endpoint http://localhost:8000/auth/signin
-- Token will be expire after 7 days from sign in by user.
+- Token will be expire after 30 days from sign in by user.
 
 Documentation
 -------------

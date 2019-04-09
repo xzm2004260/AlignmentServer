@@ -14,7 +14,7 @@ class JWTHelper:
     """
     JWT_ALGORITHM = 'HS256'
     JWT_UTF = 'utf-8'
-    JWT_TOKEN_EXPIRY = getattr(settings, 'JWT_TOKEN_EXPIRY', 7)
+    JWT_TOKEN_EXPIRY = getattr(settings, 'JWT_TOKEN_EXPIRY', 30)
 
     @staticmethod
     def encode_token(user):

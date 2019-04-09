@@ -71,6 +71,6 @@ REST_FRAMEWORK = {
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
 
-JWT_TOKEN_EXPIRY = 20
+JWT_TOKEN_EXPIRY = 30
 
 

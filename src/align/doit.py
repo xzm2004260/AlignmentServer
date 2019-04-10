@@ -23,7 +23,7 @@ EXPECTED_ORDER = 1 # the order of lyrics is sung the same way (expected) as  wri
 
 
 
-def create_recording(audioFileURI, lyrics_URI, with_section_annotations=0, is_test_case=False):
+def create_recording(audioFileURI, lyrics_URI, with_section_annotations=0, is_test_case=True):
     '''
     helper method for a couple of lines that create recording object and its lyrics
     '''
@@ -44,7 +44,7 @@ def prompt_for_input():
         return input('lyrics contain a suspicious word. Are you sure this is part of the sung lyrics? [y/n] ')         
 
 
-def align_CMU(audioFileURI, lyrics_URI,  output_URI, with_section_annotations=0, vocal_intervals_URI=None, is_test_case=False):
+def align_CMU(audioFileURI, lyrics_URI,  output_URI, with_section_annotations=0, vocal_intervals_URI=None, is_test_case=True):
     '''
     top-level call method for English audio with CMU dictionary
     '''

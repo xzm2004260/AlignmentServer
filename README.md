@@ -29,7 +29,7 @@ case 2)
 python /Users/joro/workspace/AlignmentEvaluation/align_eval/eval.py       "/Users/joro/Documents/VOICE_magix/Lyric_find/19-lyrics/" "/Users/joro/Documents/VOICE_magix/Lyric_find/19-lyrics/audionamix_separated/" . 0.5
 
 
-Magix Backend
+Introduciton
 ----------------
 Magix is a Music Technology product. A software based on Artificial Intelligence that
 accepts as inputs the voice and the text and extracts the time information for each word.
@@ -85,6 +85,10 @@ $ sudo vim local_settings.py
 $ cd ..
 $ python manage.py migrate
 ```
+
+Run
+----------------
+python3 ~/workspace/AlignmentServer/src/align/doit.py ~/Documents/VOICE_magix/Lyric_find/19-lyrics/ABBA\ -\ Knowing\ Me\,\ Knowing\ You.wav  ~/Downloads/Babe_2.lrc  2 0 test.lab
 
 Steps to production
 ----------------

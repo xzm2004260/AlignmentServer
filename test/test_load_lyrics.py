@@ -145,6 +145,27 @@ def test_load_lyrics_timed_lines():
 #     with open('persistent/talkin_in_my_sleep.lines.lyrics_str.json', 'w') as f:
 #         json.dump(all_lyrics, f ) 
 
+def test_load_lyrics_timed_lines_lrc():
+    '''
+    load lyrics as .txt file 
+    '''
+   
+#     vocal_intervals_URI = os.path.join(testDir, 'example/talkin_in_my_sleep_segs.txt' ) # or vocal_intervals_URI = None
+#     recording.vocal_intervals_to_section_links(vocal_intervals_URI) 
+    
+    with_section_annotations=2
+    audioFileURI = "/Users/joro/Documents/VOICE_magix/Lyric_find/19-lyrics/ABBA - Knowing Me, Knowing You.wav"
+    lyrics_URI = '/Users/joro/Downloads/Babe_2.lrc'
+    recording = create_recording(audioFileURI, lyrics_URI, with_section_annotations, is_test_case=True)
+    
+    all_begin_ts = []
+    all_lyrics = []
+    for section_link in  recording.sectionLinks:
+        lyrics_loaded_str =  section_link.section.lyrics.__str__()
+        print(lyrics_loaded_str)
+
+
 if __name__ == '__main__':
 #     test_load_lyrics()
-    test_load_lyrics_timed_lines()
+#     test_load_lyrics_timed_lines()
+    test_load_lyrics_timed_lines_lrc()

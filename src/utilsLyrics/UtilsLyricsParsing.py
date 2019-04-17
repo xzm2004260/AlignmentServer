@@ -185,7 +185,7 @@ def parse_lrc(lrc_file_URI):
     '''
     parse lyrics and timestamps from lrc files
     '''
-    with codecs.open(lrc_file_URI, 'rU', encoding='latin-1') as lrc_file:
+    with open(lrc_file_URI, 'rU',  newline=None, encoding='latin-1') as lrc_file:
         lrc_string = ''.join(lrc_file.readlines())
     subtitles = pylrc.parse(lrc_string)
     timestamps = []; txt_lines = []

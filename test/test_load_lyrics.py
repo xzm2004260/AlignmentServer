@@ -66,7 +66,7 @@ def setUp_recording(with_section_annotations, with_shortest_audio=True):
     helper 
     '''
     audioFileURI, lyrics_URI = setUp_test_lyrics_input(with_section_annotations, with_shortest_audio)
-    recording = create_recording(audioFileURI, lyrics_URI, with_section_annotations, is_test_case=True) 
+    recording = create_recording(audioFileURI, lyrics_URI, with_section_annotations, stop_on_susp_char=False) 
     return recording
 
 def test_load_lyrics():
@@ -156,13 +156,14 @@ def test_load_lyrics_timed_lines_lrc():
     with_section_annotations=2
     audioFileURI = "/Users/joro/Documents/VOICE_magix/Lyric_find/19-lyrics/ABBA - Knowing Me, Knowing You.wav"
     lyrics_URI = '/Users/joro/Downloads/Babe_2.lrc'
-    recording = create_recording(audioFileURI, lyrics_URI, with_section_annotations, is_test_case=True)
+    recording = create_recording(audioFileURI, lyrics_URI, with_section_annotations, stop_on_susp_char=False)
     
     all_begin_ts = []
     all_lyrics = []
     for section_link in  recording.sectionLinks:
         lyrics_loaded_str =  section_link.section.lyrics.__str__()
         print(lyrics_loaded_str)
+    assert 1
 
 
 if __name__ == '__main__':

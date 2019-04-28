@@ -23,7 +23,7 @@ EXPECTED_ORDER = 1 # the order of lyrics is sung the same way (expected) as  wri
 
 
 
-def create_recording(audioFileURI, lyrics_URI, with_section_annotations=0, is_test_case=True):
+def create_recording(audioFileURI, lyrics_URI, with_section_annotations, stop_on_susp_char):
     '''
     helper method for a couple of lines that create recording object and its lyrics
     '''
@@ -34,8 +34,9 @@ def create_recording(audioFileURI, lyrics_URI, with_section_annotations=0, is_te
     recording = GenericRecording(audioFileURI)
 
     CMUWord.input_func_name = prompt_for_input
-    if is_test_case:
-        CMUWord.input_func_name = lambda _:'y' # do not stop on asking for input, otherwise test breaks
+    #  prompt to ask for input if encounters a suspicious character in lyrics
+    if not stop_on_susp_char:
+        CMUWord.input_func_name = lambda _:'y' 
 
     recording.load_lyrics(lyrics_URI, with_section_annotations)
     return recording
@@ -44,7 +45,7 @@ def prompt_for_input():
         return input('lyrics contain a suspicious word. Are you sure this is part of the sung lyrics? [y/n] ')         
 
 
-def align_CMU(audioFileURI, lyrics_URI,  output_URI, with_section_annotations=0, vocal_intervals_URI=None, is_test_case=True):
+def align_CMU(audioFileURI, lyrics_URI,  output_URI, with_section_annotations=0, vocal_intervals_URI=None, stop_on_susp_char=False):
     '''
     top-level call method for English audio with CMU dictionary
     '''
@@ -54,7 +55,7 @@ def align_CMU(audioFileURI, lyrics_URI,  output_URI, with_section_annotations=0,
         #                     detectedTokenList, phiOptPath, detectedPath = read_decoded(URIRecordingChunkResynthesizedNoExt, detectedAlignedfileName)
     logging.info("working on recording {}".format(audioFileURI))
 
-    recording = create_recording(audioFileURI, lyrics_URI, with_section_annotations, is_test_case)
+    recording = create_recording(audioFileURI, lyrics_URI, with_section_annotations, stop_on_susp_char)
 #     print recording.sectionLinks[0].section.lyrics
 #     return
     recording.vocal_intervals_to_section_links(vocal_intervals_URI = vocal_intervals_URI) 
@@ -117,8 +118,9 @@ def doit_CMU(argv):
     else:
         vocal_intervals_URI = None
         output_URI = argv[5]
-    try:    
-        ret = align_CMU(audioFileURI, lyrics_URI, output_URI, with_section_anno, vocal_intervals_URI )
+    try:
+        # stop if there is a character that is supicious as not belonging to lyrics    
+        ret = align_CMU(audioFileURI, lyrics_URI, output_URI, with_section_anno, vocal_intervals_URI, stop_on_susp_char=True)
         print(ret)
     except (RuntimeError,FileNotFoundError) as error:
         logging.error(error)

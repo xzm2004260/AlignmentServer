@@ -52,7 +52,7 @@ def test_lyrics_align():
             output_URI = 'dummy'
             
             try:
-                aligned_token_list = align_CMU(audioFileURI, lyrics_URI,  output_URI, with_section_annotations, vocal_intervals_URI, is_test_case=True)
+                aligned_token_list = align_CMU(audioFileURI, lyrics_URI,  output_URI, with_section_annotations, vocal_intervals_URI, stop_on_susp_char=False)
             except (RuntimeError,FileNotFoundError, NotImplementedError) as error:
                 logging.error(error)
                 assert 0

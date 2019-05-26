@@ -7,10 +7,9 @@ accepts as inputs the voice and the text and extracts the time information for e
 
 Focused on voice (singing and speech) recordings with music in the background.
 
-The core research algorithm is described in the [Alignment repository]https://github.com/georgid/AlignmentDuration
+The core research algorithm is described in the [Alignment repository](https://github.com/georgid/AlignmentDuration).
 
 Implemented as a RESTful API with [Django Rest Framwork](https://www.django-rest-framework.org/).
-https://github.com/georgid/AlignmentDuration
 
 Requirements
 ------------

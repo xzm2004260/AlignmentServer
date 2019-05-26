@@ -7,8 +7,10 @@ accepts as inputs the voice and the text and extracts the time information for e
 
 Focused on voice (singing and speech) recordings with music in the background.
 
-Implemented as a restfull API with [Django Rest Framwork](https://www.django-rest-framework.org/).
+The core research algorithm is described in the [Alignment repository]https://github.com/georgid/AlignmentDuration
 
+Implemented as a RESTful API with [Django Rest Framwork](https://www.django-rest-framework.org/).
+https://github.com/georgid/AlignmentDuration
 Requirements
 ------------
 
@@ -16,6 +18,12 @@ Requirements
 - Django 2.0.3
 - Django Rest Framework 3.7.7
 - Postgres
+
+LICENSE
+-----------
+Copyright 2017-2019 Voice Magix
+For requesting a license please contact info@voicemagix.com 
+
 
 Installation
 ------------

@@ -20,9 +20,10 @@ Requirements
 - Django Rest Framework 3.7.7
 - Postgres
 
-LICENSE
+License
 -----------
 Copyright 2017-2019 Voice Magix
+
 For requesting a license please contact info@voicemagix.com 
 
 

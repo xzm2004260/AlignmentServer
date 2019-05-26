@@ -11,6 +11,7 @@ The core research algorithm is described in the [Alignment repository]https://gi
 
 Implemented as a RESTful API with [Django Rest Framwork](https://www.django-rest-framework.org/).
 https://github.com/georgid/AlignmentDuration
+
 Requirements
 ------------
 

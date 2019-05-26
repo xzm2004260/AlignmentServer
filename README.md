@@ -1,41 +1,13 @@
-Lyric-Find Dataset
---------------
-Cross-check audio from LF and annoation present from Mauch and Gracenote
-Case 1) separation with DeepConvSep
-Case 2) separation with Audionamix
-
-1. check that lyrics .lrc are the same as .wordonsets (and respectively .txt) or at least that they have same num tokens
-Load in beyond compare .txt and .lrc.
-
-2. Make sure that the annotation .wordonsets corresponds to the audio from LF
-- open in audacity
-- python ~/workspace/lakh_vocal_segments_dataset/scripts/shift_time_annotaion.py ~/Documents/VOICE_magix/Lyric_find/19-lyrics/ABBA\ -\ Knowing\ Me\,\ Knowing\ You.wordonset.tsv <time1>
-Assume that the line-level annotation has no errors.
-
-3. Time shift audio of the _vocal.wav_ version with same <time1>
-
-
-
-4. Align
-source ~/.virtualenvs/alana/bin/activate
-python3 ~/workspace/AlignmentServer/scripts/run_all_lyric_find.py 0 for case 1 and 
-python3 ~/workspace/AlignmentServer/scripts/run_all_lyric_find.py 1 for case 2
-
-5. Eval
-case 1)
-python /Users/joro/workspace/AlignmentEvaluation/align_eval/eval.py       "/Users/joro/Documents/VOICE_magix/Lyric_find/19-lyrics/" "/Users/joro/Documents/VOICE_magix/Lyric_find/19-lyrics/" . 0.5
-
-case 2)
-python /Users/joro/workspace/AlignmentEvaluation/align_eval/eval.py       "/Users/joro/Documents/VOICE_magix/Lyric_find/19-lyrics/" "/Users/joro/Documents/VOICE_magix/Lyric_find/19-lyrics/audionamix_separated/" . 0.5
 
 
 Introduciton
 ----------------
-Magix is a Music Technology product. A software based on Artificial Intelligence that
+An API based on Hidden Markov models and MLP Neural Networks that
 accepts as inputs the voice and the text and extracts the time information for each word.
-Focused on voice recordings with a musical background
-- singing and speech with music in the background.
-This platform contains restfull APIs for the client end applications.
+
+Focused on voice (singing and speech) recordings with music in the background.
+
+Implemented as a restfull API with [Django Rest Framwork](https://www.django-rest-framework.org/).
 
 Requirements
 ------------
@@ -110,3 +82,36 @@ $ python manage.py createsuperuser --username=mirza123 --email=mirza@gmail.com /
 Documentation
 -------------
 - https://documenter.getpostman.com/view/2377788/magixbackend/RVu1JBf9
+
+
+
+Lyric-Find Dataset
+--------------
+Cross-check audio from LF and annoation present from Mauch and Gracenote
+Case 1) separation with DeepConvSep
+Case 2) separation with Audionamix
+
+1. check that lyrics .lrc are the same as .wordonsets (and respectively .txt) or at least that they have same num tokens
+Load in beyond compare .txt and .lrc.
+
+2. Make sure that the annotation .wordonsets corresponds to the audio from LF
+- open in audacity
+- python ~/workspace/lakh_vocal_segments_dataset/scripts/shift_time_annotaion.py ~/Documents/VOICE_magix/Lyric_find/19-lyrics/ABBA\ -\ Knowing\ Me\,\ Knowing\ You.wordonset.tsv <time1>
+Assume that the line-level annotation has no errors.
+
+3. Time shift audio of the _vocal.wav_ version with same <time1>
+
+
+
+4. Align
+source ~/.virtualenvs/drf/bin/activate
+python3 ~/workspace/AlignmentServer/scripts/run_all_lyric_find.py 0 for case 1 and 
+python3 ~/workspace/AlignmentServer/scripts/run_all_lyric_find.py 1 for case 2
+
+5. Eval
+case 1)
+python /Users/joro/workspace/AlignmentEvaluation/align_eval/eval.py       "/Users/joro/Documents/VOICE_magix/Lyric_find/19-lyrics/" "/Users/joro/Documents/VOICE_magix/Lyric_find/19-lyrics/" . 0.5
+
+case 2)
+python /Users/joro/workspace/AlignmentEvaluation/align_eval/eval.py       "/Users/joro/Documents/VOICE_magix/Lyric_find/19-lyrics/" "/Users/joro/Documents/VOICE_magix/Lyric_find/19-lyrics/audionamix_separated/" . 0.5
+
